@@ -72,10 +72,33 @@ svg text{fill:var(--muted);font-size:11px;font-family:inherit}
 .btnlink{display:inline-block;font-size:.9rem;font-weight:600;padding:7px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);text-decoration:none}
 .btnlink:hover{border-color:var(--likes)}
 body.snap #f,body.snap #exp,body.snap .del{display:none}
+#home{padding:28px 0}
+#home .eyebrow{color:var(--likes);font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:.8rem;margin:0 0 8px}
+#home h2{font-size:clamp(1.8rem,6vw,3rem);line-height:1.1;margin:0 0 12px;letter-spacing:-.03em}
+#home .lead{color:var(--muted);font-size:1.05rem;max-width:620px;margin:0 0 24px}
+#home h3{font-size:1.05rem;margin:0 0 10px}
+.hstats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:24px}
+.hstat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px}
+.hstat small{display:block;color:var(--muted)}
+.hstat b{font-size:1.5rem;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.hbtns{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:28px}
+.hbtns .pri{background:var(--likes);border-color:var(--likes);color:#fff}
+.htop{display:grid;gap:10px;margin-bottom:16px}
+.htop button{text-align:left;display:flex;justify-content:space-between;gap:12px;width:100%}
+.hnote{color:var(--muted);font-size:.85rem}
+.chip{padding:6px 12px;font-size:.85rem}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.hch{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;margin-bottom:24px}
+.hch button{display:flex;align-items:center;gap:12px;text-align:left;width:100%;padding:12px}
+.hch img{width:48px;height:48px;border-radius:50%;object-fit:cover;background:var(--line);flex:none}
+.hch small{display:block;color:var(--muted);font-weight:500}
+body.home .wrap>:not(#home){display:none}
+body:not(.home) #home{display:none}
 </style>
 </head>
 <body>
 <div class="wrap">
+  <section id="home"></section>
   <h1>Pemantau YouTube</h1>
     <p class="sub">Server mencatat angka video dan channel secara berkala, lalu halaman ini menampilkannya sebagai grafik.</p>
   <p><a id="exp" class="btnlink" href="#" download>Simpan salinan data (bisa dibuka tanpa server)</a></p>
@@ -400,13 +423,22 @@ function renderCards(){
     var back1=el("button","","← Kembali ke daftar video");back1.type="button";
     back1.onclick=function(){detail=null;renderCards();window.scrollTo(0,0)};
     bar1.appendChild(back1);box.appendChild(bar1);
-  }else if(tab==="video"&&chFilter){
-    shown=T.items.filter(function(x){return x.channel===chFilter});
-    var bar0=el("div","");bar0.style.cssText="display:flex;align-items:center;gap:12px;flex-wrap:wrap";
-    var back=el("button","","← Kembali");back.type="button";
-    back.onclick=function(){chFilter=null;setTab("channel")};
-    bar0.appendChild(back);bar0.appendChild(el("b","","Video dari "+chFilter+" ("+shown.length+")"));
-    box.appendChild(bar0);
+  }else if(tab==="video"){
+    if(chFilter)shown=T.items.filter(function(x){return x.channel===chFilter});
+    var bar3=el("div","");bar3.style.cssText="display:flex;align-items:center;gap:8px;flex-wrap:wrap";
+    var back3=el("button","","← Beranda");back3.type="button";
+    back3.onclick=function(){chFilter=null;document.body.classList.add("home");renderHome();window.scrollTo(0,0)};
+    bar3.appendChild(back3);
+    var names=[];T.items.forEach(function(x){if(x.channel&&names.indexOf(x.channel)<0)names.push(x.channel)});
+    if(names.length>1){
+      [null].concat(names).forEach(function(n){
+        var cb=el("button","chip",n||"Semua");cb.type="button";
+        cb.setAttribute("aria-pressed",String((n||null)===(chFilter||null)));
+        cb.onclick=function(){chFilter=n;renderCards()};
+        bar3.appendChild(cb);
+      });
+    }
+    box.appendChild(bar3);
   }
   shown.forEach(function(v){
     var isCh=tab==="channel";
@@ -480,6 +512,49 @@ function load(){
     return showViz();
   }).catch(function(){setStatus("Tidak bisa terhubung ke server. Pastikan jendela hitam (cmd) masih terbuka.",true)});
 }
+function leaveHome(){document.body.classList.remove("home");window.scrollTo(0,0)}
+function renderHome(){
+  return Promise.all([api("/api/tracked"),api("/api/channels")]).then(function(r){
+    var vs=r[0].items.filter(function(x){return x.latest}),chs=r[1].items,box=$("home");box.innerHTML="";
+    var total=vs.reduce(function(a,x){return a+(x.latest.v||0)},0);
+    var subs=chs.reduce(function(a,x){return a+((x.latest&&x.latest.s)||0)},0);
+    var last=0;vs.forEach(function(x){last=Math.max(last,x.latest.t)});
+    box.appendChild(el("p","eyebrow","Pemantau YouTube"));
+    box.appendChild(el("h2","","Pantau channel dan video YouTube favoritmu, langsung"));
+    box.appendChild(el("p","lead","Views, like, komentar, dan subscriber dicatat otomatis setiap beberapa menit, lalu ditampilkan sebagai grafik yang mudah dibaca."));
+    var g=el("div","hstats");
+    [["Channel dipantau",fmt(chs.length)],["Video dipantau",fmt(vs.length)],["Total subscriber",fmt(subs)],["Total views semua video",fmt(total)]].forEach(function(x){
+      var d=el("div","hstat");d.appendChild(el("small","",x[0]));d.appendChild(el("b","",x[1]));g.appendChild(d);
+    });
+    box.appendChild(g);
+    var bt=el("div","hbtns");
+    var b1=el("button","pri","Lihat semua video");b1.type="button";b1.onclick=function(){chFilter=null;leaveHome();renderCards()};
+    bt.appendChild(b1);box.appendChild(bt);
+    if(chs.length){
+      box.appendChild(el("h3","","Channel"));
+      var gc=el("div","hch");
+      chs.forEach(function(c){
+        var b=el("button","");b.type="button";
+        var im=el("img");im.alt="";if(c.thumb)im.src=c.thumb;b.appendChild(im);
+        var t=el("span");t.appendChild(el("b","",c.title||c.id));
+        var sub=c.latest?(c.latest.s===null?"Subscriber disembunyikan":fmt(c.latest.s)+" subscriber"):"Menunggu data";
+        t.appendChild(el("small","",sub));b.appendChild(t);
+        b.onclick=function(){leaveHome();goChannel(c.title)};gc.appendChild(b);
+      });
+      box.appendChild(gc);
+    }
+    if(vs.length){
+      box.appendChild(el("h3","","Video dengan views terbanyak"));
+      var tp=el("div","htop");
+      vs.slice().sort(function(a,b){return (b.latest.v||0)-(a.latest.v||0)}).slice(0,3).forEach(function(v){
+        var b=el("button","");b.type="button";b.appendChild(el("span","",(v.channel?v.channel+" · ":"")+(v.title||v.id)));b.appendChild(el("b","",fmt(v.latest.v)+" views"));
+        b.onclick=function(){leaveHome();openVideo(v.id)};tp.appendChild(b);
+      });
+      box.appendChild(tp);
+    }
+    if(last)box.appendChild(el("p","hnote","Catatan terakhir: "+new Date(last).toLocaleString("id-ID")));
+  }).catch(function(){});
+}
 function goChannel(name){
   pendingCh=name;chFilter=null;detail=null;setTab("channel");window.scrollTo(0,0);
 }
@@ -514,7 +589,9 @@ $("f").onsubmit=function(e){
 
 if(window.SNAPSHOT)document.body.classList.add("snap");
 $("exp").href="/api/export?tz="+new Date().getTimezoneOffset();
+document.body.classList.add("home");renderHome();
 setTab("video");
+setInterval(function(){if(document.body.classList.contains("home"))renderHome()},15000);
 if(!window.SNAPSHOT||window.SNAPSHOT.live)setInterval(load,15000);
 </script>
 </body>
