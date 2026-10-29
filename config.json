@@ -3,7 +3,7 @@
     "https://www.youtube.com/watch?v=oC6brLXQe4I"
   ],
   "channels": [
-    "UCqwUnggBBct-AY2lAdI88jQ"
+    "UCqwUnggBBct-AY2lAdI88jQ",
     "UCx9hXYOCvUYwrprEqe4ZQHA"
   ],
   "autoVideos": [
@@ -12,6 +12,12 @@
       "include": ["M/V"],
       "exclude": ["teaser", "reaction", "behind", "making", "reveal", "highlight", "trailer", "challenge", "out now", "choom", "[", "performance", "dance", "live", "shorts", "#", "hits", "million", "spoiler", "freestyle", "views"],
       "max": 20
+    },
+    {
+      "channel": "UCx9hXYOCvUYwrprEqe4ZQHA",
+      "include": ["M/V"],
+      "exclude": ["teaser", "reaction", "behind", "making", "reveal", "highlight", "trailer", "challenge", "out now", "choom", "[", "performance", "dance", "live", "shorts", "#", "hits", "million", "spoiler", "freestyle", "views"],
+      "max": 10
     }
   ]
 }
