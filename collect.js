@@ -8,7 +8,7 @@ const D = path.join(__dirname, "data");
 fs.mkdirSync(D, { recursive: true });
 const cfg = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json"), "utf8"));
 const now = Date.now();
-let failed = 0;
+let failed = 0, recorded = 0;
 
 async function yt(endpoint, params) {
   const url = new URL("https://www.googleapis.com/youtube/v3/" + endpoint);
@@ -45,7 +45,9 @@ async function channel(input) {
   const s = String(input || "").trim();
   const params = { part: "snippet,statistics" };
   let val = s;
-  if (/^https?:\/\//i.test(s) || /^(www\.)?youtube\.com\//i.test(s)) {
+  const found = s.match(/UC[\w-]{22}/);
+  if (found) { params.id = found[0]; val = null; }
+  else if (/^https?:\/\//i.test(s) || /^(www\.)?youtube\.com\//i.test(s)) {
     const u = new URL(/^https?:/i.test(s) ? s : "https://" + s);
     const parts = u.pathname.split("/").filter(Boolean).map(decodeURIComponent);
     if (parts[0] === "channel") val = parts[1];
@@ -54,8 +56,7 @@ async function channel(input) {
     else throw new Error("Tautan channel belum dikenali: " + s + " (pakai @handle atau tautan /channel/UC...)");
   }
   if (val) {
-    if (/^UC[\w-]{22}$/.test(val)) params.id = val;
-    else params.forHandle = val[0] === "@" ? val : "@" + val;
+    params.forHandle = val[0] === "@" ? val : "@" + val;
   }
   const json = await yt("channels", params);
   const c = json.items && json.items[0];
@@ -63,9 +64,53 @@ async function channel(input) {
   return mapChannel(c);
 }
 
+// Memilih video dari channel berdasarkan kata di judulnya (hasil disimpan 6 jam, atau dipindai ulang saat "Run workflow").
+async function autoVideoIds() {
+  const rules = cfg.autoVideos || [];
+  if (!rules.length) return [];
+  const file = path.join(D, "auto_videos.json");
+  let cache = {};
+  try { cache = JSON.parse(fs.readFileSync(file, "utf8")); } catch (e) { /* belum ada */ }
+  const force = process.env.GITHUB_EVENT_NAME === "workflow_dispatch";
+  const out = [];
+  for (const rule of rules) {
+    const key = JSON.stringify(rule), c = cache[key];
+    if (c && !force && now - c.at < 6 * 3600e3) { out.push(...c.ids); continue; }
+    try {
+      const m = String(rule.channel || "").match(/UC[\w-]{22}/);
+      const chId = m ? m[0] : (await channel(rule.channel)).id;
+      const inc = (rule.include || ["M/V"]).map((x) => x.toLowerCase());
+      const exc = (rule.exclude || []).map((x) => x.toLowerCase());
+      const max = rule.max || 30, ids = [];
+      let token = "";
+      for (let page = 0; page < (rule.scanPages || 20) && ids.length < max; page++) {
+        const params = { part: "snippet", playlistId: "UU" + chId.slice(2), maxResults: 50 };
+        if (token) params.pageToken = token;
+        const j = await yt("playlistItems", params);
+        (j.items || []).forEach((it) => {
+          const t = (it.snippet.title || "").toLowerCase();
+          if (inc.some((x) => t.includes(x)) && !exc.some((x) => t.includes(x))) ids.push(it.snippet.resourceId.videoId);
+        });
+        token = j.nextPageToken;
+        if (!token) break;
+      }
+      const cut = ids.slice(0, max);
+      cache[key] = { at: now, ids: cut };
+      out.push(...cut);
+      console.log("Video otomatis dari " + rule.channel + ": " + cut.length);
+    } catch (e) {
+      failed++; console.log("::warning::Video otomatis gagal: " + e.message);
+      if (c) out.push(...c.ids);
+    }
+  }
+  fs.writeFileSync(file, JSON.stringify(cache, null, 2));
+  return out;
+}
+
 (async () => {
   // ----- Video -----
-  const ids = [...new Set((cfg.videos || []).map(videoId).filter(Boolean))];
+  const autoIds = await autoVideoIds();
+  const ids = [...new Set([...(cfg.videos || []).map(videoId), ...autoIds].filter(Boolean))];
   if (ids.length) {
     try {
       const metas = [], lines = [];
@@ -83,8 +128,9 @@ async function channel(input) {
         fs.appendFileSync(path.join(D, "samples.jsonl"), lines.join("\n") + "\n");
         fs.writeFileSync(path.join(D, "videos.json"), JSON.stringify(metas, null, 2));
       }
+      recorded += lines.length;
       console.log("Video tercatat:", lines.length + "/" + ids.length);
-    } catch (e) { failed++; console.error("Video gagal:", e.message); }
+    } catch (e) { failed++; console.log("::warning::Video gagal: " + e.message); }
   }
   // ----- Channel -----
   const metas = [], lines = [];
@@ -94,12 +140,13 @@ async function channel(input) {
       if (metas.some((m) => m.id === c.id)) continue;
       metas.push({ id: c.id, title: c.title, handle: c.handle, thumb: c.thumb });
       lines.push(JSON.stringify({ id: c.id, t: now, s: c.subs, v: c.views, n: c.videos }));
-    } catch (e) { failed++; console.error("Channel gagal:", e.message); }
+    } catch (e) { failed++; console.log("::warning::Channel gagal: " + e.message); }
   }
   if (lines.length) {
     fs.appendFileSync(path.join(D, "channel_samples.jsonl"), lines.join("\n") + "\n");
     fs.writeFileSync(path.join(D, "channels.json"), JSON.stringify(metas, null, 2));
   }
+  recorded += lines.length;
   console.log("Channel tercatat:", lines.length + "/" + (cfg.channels || []).length);
-  if (failed) process.exit(1);
+  if (failed && !recorded) process.exit(1); // gagal total; kalau sebagian berhasil, datanya tetap disimpan
 })();
