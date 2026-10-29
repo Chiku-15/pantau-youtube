@@ -379,18 +379,29 @@ var TABS={
     viz:null,items:[],sel:null
   }
 };
-var tab="video",confirmDel=null;
+var tab="video",confirmDel=null,chFilter=null;
 TABS.video.viz=makeViz($("vz-video"),{kind:"video",metrics:TABS.video.metrics});
 TABS.channel.viz=makeViz($("vz-channel"),{kind:"channel",metrics:TABS.channel.metrics,legend:TABS.channel.legend});
 
 function renderCards(){
   var T=TABS[tab],box=$("list");box.innerHTML="";
-  T.items.forEach(function(v){
+  var shown=T.items;
+  if(tab==="video"&&chFilter){
+    shown=T.items.filter(function(x){return x.channel===chFilter});
+    var bar0=el("div","");bar0.style.cssText="display:flex;align-items:center;gap:12px;flex-wrap:wrap";
+    var back=el("button","","← Kembali");back.type="button";
+    back.onclick=function(){chFilter=null;setTab("channel")};
+    bar0.appendChild(back);bar0.appendChild(el("b","","Video dari "+chFilter+" ("+shown.length+")"));
+    box.appendChild(bar0);
+  }
+  shown.forEach(function(v){
     var isCh=tab==="channel";
     var c=el("article","card"+(isCh?" ch":"")+(v.id===T.sel?" sel":""));
     var img=el("img");img.alt="";if(v.thumb)img.src=v.thumb;c.appendChild(img);
     var right=el("div");
-    var h=el("h2"),a=el("a","",v.title||v.id);a.href=isCh?"https://www.youtube.com/channel/"+v.id:"https://youtu.be/"+v.id;a.target="_blank";a.rel="noopener";h.appendChild(a);
+    var h=el("h2"),a=el("a","",v.title||v.id);a.href=isCh?"https://www.youtube.com/channel/"+v.id:"https://youtu.be/"+v.id;a.target="_blank";a.rel="noopener";
+    if(isCh){a.href="#";a.title="Lihat video channel ini";a.removeAttribute("target");a.onclick=function(e){e.preventDefault();openChannel(v.title)}}
+    h.appendChild(a);
     right.appendChild(h);right.appendChild(el("p","ch",isCh?(v.handle||""):(v.channel||"")));
     var stt=el("div","stats");
     T.metrics.forEach(function(m){
@@ -444,6 +455,10 @@ function load(){
     return showViz();
   }).catch(function(){setStatus("Tidak bisa terhubung ke server. Pastikan jendela hitam (cmd) masih terbuka.",true)});
 }
+function openChannel(name){
+  chFilter=name;var T=TABS.video,mine=T.items.filter(function(x){return x.channel===name});
+  T.sel=mine.length?mine[0].id:null;setTab("video");
+}
 function setTab(t){
   tab=t;confirmDel=null;var T=TABS[t];
   document.querySelectorAll("button[data-tab]").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.tab===t))});
@@ -452,7 +467,7 @@ function setTab(t){
   $("list").innerHTML="";
   load();
 }
-$("tabs").addEventListener("click",function(e){var b=e.target.closest("button[data-tab]");if(b&&b.dataset.tab!==tab)setTab(b.dataset.tab)});
+$("tabs").addEventListener("click",function(e){var b=e.target.closest("button[data-tab]");if(b&&(b.dataset.tab!==tab||chFilter)){chFilter=null;setTab(b.dataset.tab)}});
 
 $("f").onsubmit=function(e){
   e.preventDefault();
