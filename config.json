@@ -4,5 +4,13 @@
   ],
   "channels": [
     "UCqwUnggBBct-AY2lAdI88jQ"
+  ],
+  "autoVideos": [
+    {
+      "channel": "UCqwUnggBBct-AY2lAdI88jQ",
+      "include": ["M/V"],
+      "exclude": ["teaser", "reaction", "behind", "making", "reveal", "highlight", "trailer", "challenge"],
+      "max": 20
+    }
   ]
 }
