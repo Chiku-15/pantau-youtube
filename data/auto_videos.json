@@ -162,7 +162,7 @@
     ]
   },
   "{\"channel\":\"UCqwUnggBBct-AY2lAdI88jQ\",\"include\":[\"M/V\"],\"exclude\":[\"teaser\",\"reaction\",\"behind\",\"making\",\"reveal\",\"highlight\",\"trailer\",\"challenge\",\"out now\",\"choom\",\"[\",\"performance\",\"dance\",\"live\",\"shorts\",\"#\",\"hits\",\"million\",\"spoiler\",\"freestyle\",\"views\"],\"max\":50}": {
-    "at": 1793286084385,
+    "at": 1793286488586,
     "ids": [
       "oC6brLXQe4I",
       "xXZwZ0DolJc",
@@ -182,7 +182,7 @@
     ]
   },
   "{\"channel\":\"UCx9hXYOCvUYwrprEqe4ZQHA\",\"include\":[\"M/V\"],\"exclude\":[\"teaser\",\"reaction\",\"behind\",\"making\",\"reveal\",\"highlight\",\"trailer\",\"challenge\",\"out now\",\"choom\",\"[\",\"performance\",\"dance\",\"live\",\"shorts\",\"#\",\"hits\",\"million\",\"spoiler\",\"freestyle\",\"views\",\"JP Ver.\",\"-JP\",\"COMMENTARY\"],\"max\":50}": {
-    "at": 1793286084385,
+    "at": 1793286488586,
     "ids": [
       "GCedXwbwMfQ",
       "QERKD90hG98",
@@ -195,6 +195,13 @@
   },
   "{\"channel\":\"UC7Q3HUnJA3nvjZR2JeMn2Cw\",\"include\":[\"MV\"],\"exclude\":[\"teaser\",\"reaction\",\"behind\",\"making\",\"reveal\",\"highlight\",\"trailer\",\"challenge\",\"out now\",\"choom\",\"[\",\"performance\",\"dance\",\"live\",\"shorts\",\"#\",\"hits\",\"million\",\"spoiler\",\"freestyle\",\"views\",\"Commentary\",\"Kia\",\"BH2ND\",\"EP.\"],\"max\":50}": {
     "at": 1793286084385,
+    "ids": [
+      "lu9GinsuyUQ",
+      "gNUMxMuxH20"
+    ]
+  },
+  "{\"channel\":\"UC7Q3HUnJA3nvjZR2JeMn2Cw\",\"include\":[\"MV\"],\"exclude\":[\"teaser\",\"reaction\",\"behind\",\"making\",\"reveal\",\"highlight\",\"trailer\",\"challenge\",\"out now\",\"choom\",\"[\",\"performance\",\"dance\",\"live\",\"shorts\",\"#\",\"hits\",\"million\",\"spoiler\",\"freestyle\",\"views\",\"Commentary\",\"Kia\",\"BH2ND\",\"EP.\"],\"max\":100}": {
+    "at": 1793286488586,
     "ids": [
       "lu9GinsuyUQ",
       "gNUMxMuxH20"
