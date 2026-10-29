@@ -23,7 +23,7 @@
     },
     {
       "channel": "UC7Q3HUnJA3nvjZR2JeMn2Cw",
-      "include": ["M/V"],
+      "include": ["MV"],
       "exclude": ["teaser", "reaction", "behind", "making", "reveal", "highlight", "trailer", "challenge", "out now", "choom", "[", "performance", "dance", "live", "shorts", "#", "hits", "million", "spoiler", "freestyle", "views"],
       "max": 20
     }
