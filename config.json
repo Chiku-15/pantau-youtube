@@ -11,13 +11,13 @@
       "channel": "UCqwUnggBBct-AY2lAdI88jQ",
       "include": ["M/V"],
       "exclude": ["teaser", "reaction", "behind", "making", "reveal", "highlight", "trailer", "challenge", "out now", "choom", "[", "performance", "dance", "live", "shorts", "#", "hits", "million", "spoiler", "freestyle", "views"],
-      "max": 50
+      "max": 150
     },
     {
       "channel": "UCx9hXYOCvUYwrprEqe4ZQHA",
       "include": ["M/V"],
       "exclude": ["teaser", "reaction", "behind", "making", "reveal", "highlight", "trailer", "challenge", "out now", "choom", "[", "performance", "dance", "live", "shorts", "#", "hits", "million", "spoiler", "freestyle", "views", "JP Ver.", "-JP", "COMMENTARY"],
-      "max": 50
+      "max": 150
     }
   ]
 }
