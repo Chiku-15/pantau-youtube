@@ -160,5 +160,44 @@
       "eBrvBlnhR9c",
       "RiLdxgHYzU8"
     ]
+  },
+  "{\"channel\":\"UCqwUnggBBct-AY2lAdI88jQ\",\"include\":[\"M/V\"],\"exclude\":[\"teaser\",\"reaction\",\"behind\",\"making\",\"reveal\",\"highlight\",\"trailer\",\"challenge\",\"out now\",\"choom\",\"[\",\"performance\",\"dance\",\"live\",\"shorts\",\"#\",\"hits\",\"million\",\"spoiler\",\"freestyle\",\"views\"],\"max\":50}": {
+    "at": 1793286084385,
+    "ids": [
+      "oC6brLXQe4I",
+      "xXZwZ0DolJc",
+      "9cS2wv6AfHk",
+      "naoGk-Zjc1s",
+      "SbdOIdg2McI",
+      "yd_uG3TtREs",
+      "wlHwjkYpSr0",
+      "xn8mQqz2xmM",
+      "XShaIZs7J7M",
+      "1kXLsrun51s",
+      "Zp-Jhuhq0bQ",
+      "o0oW3lPoOXM",
+      "eJCHKjt0MPw",
+      "2wA_b6YHjqQ",
+      "GsV1i0QHi-o"
+    ]
+  },
+  "{\"channel\":\"UCx9hXYOCvUYwrprEqe4ZQHA\",\"include\":[\"M/V\"],\"exclude\":[\"teaser\",\"reaction\",\"behind\",\"making\",\"reveal\",\"highlight\",\"trailer\",\"challenge\",\"out now\",\"choom\",\"[\",\"performance\",\"dance\",\"live\",\"shorts\",\"#\",\"hits\",\"million\",\"spoiler\",\"freestyle\",\"views\",\"JP Ver.\",\"-JP\",\"COMMENTARY\"],\"max\":50}": {
+    "at": 1793286084385,
+    "ids": [
+      "GCedXwbwMfQ",
+      "QERKD90hG98",
+      "KcW1_wI6rsc",
+      "gZNQs3jA7aE",
+      "R55VGD7aYUI",
+      "eBrvBlnhR9c",
+      "RiLdxgHYzU8"
+    ]
+  },
+  "{\"channel\":\"UC7Q3HUnJA3nvjZR2JeMn2Cw\",\"include\":[\"MV\"],\"exclude\":[\"teaser\",\"reaction\",\"behind\",\"making\",\"reveal\",\"highlight\",\"trailer\",\"challenge\",\"out now\",\"choom\",\"[\",\"performance\",\"dance\",\"live\",\"shorts\",\"#\",\"hits\",\"million\",\"spoiler\",\"freestyle\",\"views\",\"Commentary\",\"Kia\",\"BH2ND\",\"EP.\"],\"max\":50}": {
+    "at": 1793286084385,
+    "ids": [
+      "lu9GinsuyUQ",
+      "gNUMxMuxH20"
+    ]
   }
 }
