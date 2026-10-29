@@ -12,6 +12,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple
 .wrap{max-width:980px;margin:0 auto;padding:24px 16px 48px}
 h1{font-size:clamp(1.4rem,4vw,2rem);margin:0 0 4px;letter-spacing:-.02em}
 .sub{color:var(--muted);margin:0 0 18px}
+#tabs{display:none}
 .row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
 input,button{font:inherit;padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
 input{flex:1;min-width:220px}
@@ -76,7 +77,7 @@ body.snap #f,body.snap #exp,body.snap .del{display:none}
 <body>
 <div class="wrap">
   <h1>Pemantau YouTube</h1>
-  <p class="sub">Server mencatat angka video dan channel secara berkala, lalu halaman ini menampilkannya sebagai grafik.</p>
+    <p class="sub">Server mencatat angka video dan channel secara berkala, lalu halaman ini menampilkannya sebagai grafik.</p>
   <p><a id="exp" class="btnlink" href="#" download>Simpan salinan data (bisa dibuka tanpa server)</a></p>
   <div class="seg tabs" id="tabs" role="group" aria-label="Pilih jenis pantauan">
     <button type="button" data-tab="video" aria-pressed="true">Video</button>
@@ -379,7 +380,7 @@ var TABS={
     viz:null,items:[],sel:null
   }
 };
-var tab="video",confirmDel=null,chFilter=null,detail=null;
+var tab="video",confirmDel=null,chFilter=null,detail=null,pendingCh=null;
 TABS.video.viz=makeViz($("vz-video"),{kind:"video",metrics:TABS.video.metrics});
 TABS.channel.viz=makeViz($("vz-channel"),{kind:"channel",metrics:TABS.channel.metrics,legend:TABS.channel.legend});
 
@@ -387,6 +388,12 @@ function renderCards(){
   var T=TABS[tab],box=$("list");box.innerHTML="";
   var shown=T.items;
   $("vz-video").hidden=!(tab==="video"&&detail);
+  if(tab==="channel"){
+    var bar2=el("div","");
+    var back2=el("button","","← Kembali ke daftar video");back2.type="button";
+    back2.onclick=function(){chFilter=null;detail=null;setTab("video");window.scrollTo(0,0)};
+    bar2.appendChild(back2);box.appendChild(bar2);
+  }
   if(tab==="video"&&detail){
     shown=T.items.filter(function(x){return x.id===detail});
     var bar1=el("div","");bar1.style.cssText="display:flex;align-items:center;gap:12px;flex-wrap:wrap";
@@ -410,7 +417,10 @@ function renderCards(){
     if(isCh){a.href="#";a.title="Lihat video channel ini";a.removeAttribute("target");a.onclick=function(e){e.preventDefault();openChannel(v.title)}}
     if(!isCh){a.href="#";a.title="Lihat grafik dan data";a.removeAttribute("target");a.onclick=function(e){e.preventDefault();openVideo(v.id)}}
     h.appendChild(a);
-    right.appendChild(h);right.appendChild(el("p","ch",isCh?(v.handle||""):(v.channel||"")));
+    right.appendChild(h);var pc=el("p","ch");
+    if(isCh){pc.textContent=v.handle||""}
+    else if(v.channel){var cl=el("a","",v.channel);cl.href="#";cl.title="Buka channel";cl.style.cssText="color:inherit;text-decoration:underline";cl.onclick=function(e){e.preventDefault();goChannel(v.channel)};pc.appendChild(cl)}
+    right.appendChild(pc);
     var stt=el("div","stats");
     T.metrics.forEach(function(m){
       var k=m[0],s=el("div","stat");s.appendChild(el("small","",m[1]));
@@ -459,6 +469,7 @@ function load(){
     if(myTab!==tab)return;
     T.items=j.items;
     if(T.sel&&!T.items.some(function(v){return v.id===T.sel}))T.sel=null;
+    if(pendingCh&&tab==="channel"){var pm=T.items.filter(function(x){return x.title===pendingCh})[0];if(pm)T.sel=pm.id;pendingCh=null}
     if(!T.sel&&T.items.length)T.sel=T.items[0].id;
     if(tab==="video"&&detail&&!T.items.some(function(v){return v.id===detail}))detail=null;
     renderCards();
@@ -468,6 +479,9 @@ function load(){
     if(window.SNAPSHOT)setStatus(window.SNAPSHOT.statusText||("Salinan data per "+new Date(window.SNAPSHOT.at).toLocaleString("id-ID")+". Server tidak terhubung, jadi angka tidak diperbarui."),false,true);
     return showViz();
   }).catch(function(){setStatus("Tidak bisa terhubung ke server. Pastikan jendela hitam (cmd) masih terbuka.",true)});
+}
+function goChannel(name){
+  pendingCh=name;chFilter=null;detail=null;setTab("channel");window.scrollTo(0,0);
 }
 function openChannel(name){
   chFilter=name;detail=null;var T=TABS.video,mine=T.items.filter(function(x){return x.channel===name});
