@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pemantau YouTube</title>
+<style>
+:root{--bg:#EEF2F8;--surface:#fff;--ink:#112240;--muted:#5B6B86;--line:#D9E1EE;--views:#D7263D;--likes:#2A6FDB;--comments:#0F9D78;--ok:#0F9D78;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#0C1424;--surface:#142039;--ink:#E8EEF9;--muted:#93A3BF;--line:#26365A;--views:#FF5468;--likes:#5B9BFF;--comments:#35C9A0;--ok:#35C9A0;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5}
+.wrap{max-width:980px;margin:0 auto;padding:24px 16px 48px}
+h1{font-size:clamp(1.4rem,4vw,2rem);margin:0 0 4px;letter-spacing:-.02em}
+.sub{color:var(--muted);margin:0 0 18px}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+input,button{font:inherit;padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
+input{flex:1;min-width:220px}
+button{font-weight:600;cursor:pointer}
+button:hover{border-color:var(--likes)}
+:focus-visible{outline:3px solid var(--likes);outline-offset:2px}
+#status{font-size:.9rem;color:var(--muted);margin:0 0 14px}
+#status.err{color:var(--views)}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--ok);margin-right:6px}
+.dot.off{background:var(--muted)}
+#list{display:grid;gap:12px;margin-bottom:16px}
+.card{background:var(--surface);border:2px solid var(--line);border-radius:10px;padding:12px;display:grid;grid-template-columns:160px 1fr;gap:14px}
+.card.sel{border-color:var(--likes)}
+.card img{width:160px;height:90px;object-fit:cover;border-radius:6px;background:var(--line)}
+.card h2{font-size:1rem;margin:0}
+.card h2 a{color:inherit;text-decoration:none}
+.card h2 a:hover{text-decoration:underline}
+.ch{color:var(--muted);font-size:.85rem;margin:0 0 6px}
+.stats{display:flex;flex-wrap:wrap;gap:4px 22px}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.4rem;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.delta{font-size:.8rem;font-weight:600;color:var(--ok);margin-left:6px}
+.acts{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;color:var(--muted);font-size:.8rem}
+.acts button{padding:4px 12px;font-size:.85rem}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px}
+.panel h2{font-size:1.05rem;margin:0 0 10px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;margin-bottom:10px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;border-radius:0;background:transparent;padding:7px 12px}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+#gain{color:var(--muted);font-size:.9rem;margin:0 0 4px}
+#readout{min-height:1.5em;font-size:.9rem;margin:0 0 6px;font-weight:600}
+#chart{width:100%;height:auto;display:block;touch-action:pan-y}
+#chart text{fill:var(--muted);font-size:11px;font-family:inherit}
+.empty{color:var(--muted);padding:40px 0;text-align:center}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:560px;margin-top:8px}
+th,td{text-align:left;padding:8px 8px;border-bottom:1px solid var(--line);font-size:.9rem}
+th{color:var(--muted);font-weight:600}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+td.note{color:var(--muted);font-size:.82rem}
+#sstat{margin:0 0 4px;font-size:.95rem}
+#sread{min-height:1.5em;font-size:.9rem;margin:0 0 6px;font-weight:600}
+#bars{width:100%;height:auto;display:block;touch-action:pan-y}
+#bars text{fill:var(--muted);font-size:11px;font-family:inherit}
+.legend{color:var(--muted);font-size:.82rem;margin:6px 0 0}
+#spanel{margin-top:16px}
+.tabs{margin-bottom:14px}
+.card.ch{grid-template-columns:90px 1fr}
+.card.ch img{width:90px;height:90px;border-radius:50%}
+.stat small.hid{color:var(--muted)}
+.vz{margin-top:16px}
+.vz .panel+.panel{margin-top:16px}
+svg text{fill:var(--muted);font-size:11px;font-family:inherit}
+.acts button.del{margin-left:28px;color:var(--muted);font-weight:500}
+.acts button.del-yes{background:var(--views);border-color:var(--views);color:#fff}
+.btnlink{display:inline-block;font-size:.9rem;font-weight:600;padding:7px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);text-decoration:none}
+.btnlink:hover{border-color:var(--likes)}
+body.snap #f,body.snap #exp,body.snap .del{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Pemantau YouTube</h1>
+  <p class="sub">Server mencatat angka video dan channel secara berkala, lalu halaman ini menampilkannya sebagai grafik.</p>
+  <p><a id="exp" class="btnlink" href="#" download>Simpan salinan data (bisa dibuka tanpa server)</a></p>
+  <div class="seg tabs" id="tabs" role="group" aria-label="Pilih jenis pantauan">
+    <button type="button" data-tab="video" aria-pressed="true">Video</button>
+    <button type="button" data-tab="channel" aria-pressed="false">Channel</button>
+  </div>
+  <form class="row" id="f">
+    <input id="url" aria-label="Tautan atau ID" autocomplete="off">
+    <button type="submit" id="addbtn">Tambah video</button>
+  </form>
+  <p id="status" role="status"></p>
+  <div id="list"></div>
+  <div class="vz" id="vz-video"></div>
+  <div class="vz" id="vz-channel" hidden></div>
+</div>
+
+<script>
+(function(){
+var RANGES={"1h":3600e3,"24h":864e5,"7d":6048e5,all:Infinity};
+const SUMMARY_COUNT = { hour: 24, day: 30, month: 12 };
+function lowerBound(arr, t) {
+  let lo = 0, hi = arr.length;
+  while (lo < hi) { const mid = (lo + hi) >> 1; if (arr[mid].t < t) lo = mid + 1; else hi = mid; }
+  return lo;
+}
+// Pertambahan per periode = angka terakhir di periode itu dikurangi angka terakhir sebelum periode itu.
+// offMin = selisih zona waktu dari browser (Date.getTimezoneOffset), supaya batas jam/hari/bulan mengikuti waktu setempat.
+function summarize(arr, by, offMin, keys) {
+  if (!arr.length) return [];
+  const off = offMin * 60000;
+  const startOf = (ms) => {
+    const d = new Date(ms), y = d.getUTCFullYear(), m = d.getUTCMonth(), day = d.getUTCDate();
+    return by === "hour" ? Date.UTC(y, m, day, d.getUTCHours()) : by === "day" ? Date.UTC(y, m, day) : Date.UTC(y, m, 1);
+  };
+  const step = (ls, n) => {
+    if (by === "hour") return ls + n * 3600e3;
+    if (by === "day") return ls + n * 86400e3;
+    const d = new Date(ls);
+    return Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + n, 1);
+  };
+  const currentStart = startOf(Date.now() - off);
+  const firstStart = startOf(arr[0].t - off);
+  const out = [];
+  for (let i = SUMMARY_COUNT[by] - 1; i >= 0; i--) {
+    const ls = step(currentStart, -i);
+    if (ls < firstStart) continue; // sebelum pencatatan dimulai
+    const lo = ls + off, hi = step(ls, 1) + off, prevLo = step(ls, -1) + off;
+    const a = lowerBound(arr, lo), b = lowerBound(arr, hi);
+    const inb = arr.slice(a, b);
+    if (!inb.length) { out.push({ t: lo, empty: true }); continue; }
+    const before = a > 0 ? arr[a - 1] : null;
+    const base = before || inb[0];
+    const end = inb[inb.length - 1];
+    const gain = (k) => (base[k] === null || end[k] === null || base[k] === undefined || end[k] === undefined ? null : end[k] - base[k]);
+    const g = {};
+    keys.forEach((k) => { g[k] = gain(k); });
+    out.push({
+      t: lo, ...g,
+      partial: !before,                          // pencatatan baru mulai di tengah periode ini
+      gap: !!before && before.t < prevLo,        // ada periode kosong sebelumnya, pertambahan ikut menghitung celah itu
+      live: hi > Date.now(),                     // periode masih berjalan
+    });
+  }
+  return out;
+}
+
+
+function jl(t){return t.split("\n").filter(Boolean).map(function(l){try{return JSON.parse(l)}catch(e){return null}}).filter(Boolean)}
+function get(u,txt){return fetch(u+"?t="+Date.now()).then(function(r){if(!r.ok)throw 0;return txt?r.text():r.json()}).catch(function(){return txt?"":[]})}
+function group(rows){var m={};rows.forEach(function(r){(m[r.id]=m[r.id]||[]).push(r)});return m}
+function arrOf(S,kind,id){return ((kind==="channel"?S.cs:S.vs)[id])||[]}
+function refresh(){
+  return Promise.all([get("data/videos.json"),get("data/channels.json"),get("data/samples.jsonl",1),get("data/channel_samples.jsonl",1)]).then(function(a){
+    var vs=group(jl(a[2])),cs=group(jl(a[3])),last=0;
+    function items(list,m){return list.map(function(v){var arr=m[v.id]||[];if(arr.length)last=Math.max(last,arr[arr.length-1].t);return Object.assign({},v,{latest:arr[arr.length-1]||null,prev:arr[arr.length-2]||null,first:arr[0]||null})})}
+    var S=window.SNAPSHOT=window.SNAPSHOT||{live:true,intervalSeconds:300,error:null};
+    S.tracked=items(a[0],vs);S.channels=items(a[1],cs);S.vs=vs;S.cs=cs;S.at=Date.now();
+    S.statusText="Data dicatat otomatis oleh GitHub kira-kira tiap 5 menit (bisa tertunda)."+(last?" Catatan terakhir: "+new Date(last).toLocaleString("id-ID")+".":"");
+    S.histFn=function(kind,id,rk){
+      var range=RANGES[rk]||RANGES["24h"],now=Date.now();
+      var r=arrOf(S,kind,id).filter(function(s){return range===Infinity||s.t>=now-range});
+      if(r.length>600){var step=Math.ceil(r.length/600),lastp=r[r.length-1];r=r.filter(function(_,i){return i%step===0});if(r[r.length-1]!==lastp)r.push(lastp)}
+      return r;
+    };
+    S.sumFn=function(kind,id,by,tz){return summarize(arrOf(S,kind,id),by,tz,kind==="channel"?["s","v","n"]:["v","l","c"])};
+  });
+}
+window.__refresh=refresh;
+refresh().then(function(){
+  var s=document.createElement("script");s.textContent=document.getElementById("main").textContent;document.body.appendChild(s);
+  setInterval(refresh,60000);
+});
+})();
+</script>
+<script type="text/plain" id="main">
+var $=function(i){return document.getElementById(i)};
+var nf=new Intl.NumberFormat("id-ID");
+function fmt(n){return n===null||n===undefined?"–":nf.format(n)}
+function sg(n){return n===null||n===undefined?"–":(n>0?"+":"")+fmt(n)}
+function el(tag,cls,text){var e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e}
+function hhmm(t){return new Date(t).toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"})}
+function stamp(t,span){
+  var d=new Date(t);
+  if(span<=26*3600e3)return hhmm(t);
+  return d.toLocaleDateString("id-ID",{day:"numeric",month:"short"})+" "+hhmm(t);
+}
+function snapApi(path,opt){
+  var S=window.SNAPSHOT,u=new URL(path,location.href),p=u.pathname,g=function(k){return u.searchParams.get(k)};
+  if(opt&&opt.method&&opt.method!=="GET")return Promise.reject(new Error("Ini salinan data, tidak bisa diubah."));
+  if(p==="/api/tracked")return Promise.resolve({intervalSeconds:S.intervalSeconds,error:null,items:S.tracked});
+  if(p==="/api/channels")return Promise.resolve({intervalSeconds:S.intervalSeconds,error:null,items:S.channels});
+  var kind=g("kind")==="channel"?"channel":"video";
+  if(p==="/api/history")return Promise.resolve({items:S.histFn?S.histFn(kind,g("id"),g("range")):(S.hist[kind+"|"+g("id")+"|"+g("range")]||[])});
+  if(p==="/api/summary")return Promise.resolve({by:g("by"),items:S.sumFn?S.sumFn(kind,g("id"),g("by"),Number(g("tz"))||0):(S.sum[kind+"|"+g("id")+"|"+g("by")]||[])});
+  return Promise.reject(new Error("Tidak tersedia di salinan."));
+}
+function api(path,opt){
+  if(window.SNAPSHOT)return snapApi(path,opt);
+  opt=opt||{};opt.headers=Object.assign({"Content-Type":"application/json","X-Requested-With":"ytlive"},opt.headers||{});
+  return fetch(path,opt).then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error(j.error||("Kesalahan "+r.status));return j})});
+}
+function setStatus(msg,err,off){
+  var s=$("status");s.className=err?"err":"";s.innerHTML="";
+  s.appendChild(el("span","dot"+(err||off?" off":"")));s.appendChild(document.createTextNode(msg));
+}
+function parseId(s){
+  s=s.trim();
+  if(/^[\w-]{11}$/.test(s))return s;
+  try{
+    var u=new URL(s),h=u.hostname.replace(/^www\./,"");
+    if(h==="youtu.be")return u.pathname.slice(1,12);
+    var m=u.pathname.match(/^\/(?:shorts|live|embed)\/([\w-]{11})/);
+    if(m)return m[1];
+    var v=u.searchParams.get("v");
+    if(v&&/^[\w-]{11}$/.test(v))return v;
+  }catch(e){}
+  return null;
+}
+function niceTicks(mn,mx,n){
+  var rg=mx-mn||1,step=Math.pow(10,Math.floor(Math.log10(rg/n))),e=rg/n/step;
+  step*=(e<=1?1:e<=2?2:e<=5?5:10);
+  var out=[],s=Math.ceil(mn/step)*step;
+  for(var v=s;v<=mx+1e-9;v+=step)out.push(v);
+  return out;
+}
+function plabel(t,b,short){
+  var d=new Date(t);
+  if(b==="hour")return short?hhmm(t):d.toLocaleDateString("id-ID",{day:"numeric",month:"short"})+" "+hhmm(t);
+  if(b==="day")return d.toLocaleDateString("id-ID",{day:"numeric",month:"short"});
+  return d.toLocaleDateString("id-ID",{month:"short",year:"numeric"});
+}
+function notes(x){
+  var a=[];
+  if(x.empty)a.push("Tidak ada data");
+  if(x.partial)a.push("Pencatatan baru mulai di periode ini");
+  if(x.gap)a.push("Termasuk celah saat tidak ada pencatatan");
+  if(x.live)a.push("Periode masih berjalan");
+  return a.join("; ");
+}
+
+/* ---------- Komponen grafik + ringkasan (dipakai tab Video dan tab Channel) ---------- */
+function makeViz(root,cfg){
+  var st={id:null,m:cfg.metrics[0][0],r:"24h",b:"hour",hist:[],sum:[]};
+  var NAME={},COL={};cfg.metrics.forEach(function(x){NAME[x[0]]=x[1];COL[x[0]]=x[2]});
+  function segM(){return cfg.metrics.map(function(x,i){return '<button type="button" data-m="'+x[0]+'" aria-pressed="'+(i===0)+'">'+x[1]+'</button>'}).join("")}
+  root.innerHTML=
+   '<section class="panel" data-r="panel" hidden><h2 data-r="ptitle">Grafik</h2>'+
+   '<div class="ctl"><div class="seg" role="group" aria-label="Pilih data">'+segM()+'</div>'+
+   '<div class="seg" role="group" aria-label="Pilih rentang waktu"><button type="button" data-r="1h" aria-pressed="false">1 jam</button><button type="button" data-r="24h" aria-pressed="true">24 jam</button><button type="button" data-r="7d" aria-pressed="false">7 hari</button><button type="button" data-r="all" aria-pressed="false">Semua</button></div></div>'+
+   '<p data-r="gain" style="color:var(--muted);font-size:.9rem;margin:0 0 4px"></p>'+
+   '<p data-r="readout" style="min-height:1.5em;font-size:.9rem;margin:0 0 6px;font-weight:600">Arahkan kursor ke grafik untuk melihat angka.</p>'+
+   '<div class="empty" data-r="empty" hidden>Data masih sedikit. Tunggu beberapa menit sampai server mencatat lebih dari satu kali.</div>'+
+   '<svg data-r="chart" class="chart" viewBox="0 0 800 320" role="img" aria-label="Grafik riwayat" style="width:100%;height:auto;display:block;touch-action:pan-y"></svg></section>'+
+   '<section class="panel" data-r="spanel" hidden><h2>Ringkasan pertambahan</h2>'+
+   '<div class="ctl"><div class="seg" role="group" aria-label="Pilih data">'+segM()+'</div>'+
+   '<div class="seg" role="group" aria-label="Pilih periode"><button type="button" data-b="hour" aria-pressed="true">Per jam</button><button type="button" data-b="day" aria-pressed="false">Per hari</button><button type="button" data-b="month" aria-pressed="false">Per bulan</button></div></div>'+
+   '<p data-r="sstat" style="margin:0 0 4px;font-size:.95rem"></p>'+
+   '<p data-r="sread" style="min-height:1.5em;font-size:.9rem;margin:0 0 6px;font-weight:600">Arahkan kursor ke batang untuk melihat rinciannya.</p>'+
+   '<div data-r="sempty" class="empty" hidden>Belum ada data untuk periode ini. Biarkan server mencatat lebih lama.</div>'+
+   '<svg data-r="bars" viewBox="0 0 800 260" role="img" aria-label="Grafik batang pertambahan per periode" style="width:100%;height:auto;display:block;touch-action:pan-y"></svg>'+
+   '<p class="legend">Batang pudar berarti periodenya belum penuh, datanya sebagian, atau ada celah saat tidak ada pencatatan.'+(cfg.legend||"")+'</p>'+
+   '<div class="scroll"><table><thead><tr><th>Periode</th>'+cfg.metrics.map(function(x){return '<th class="n">'+x[1]+'</th>'}).join("")+'<th>Catatan</th></tr></thead><tbody data-r="stable"></tbody></table></div></section>';
+  function q(n){return root.querySelector('[data-r="'+n+'"]')}
+  function sync(){
+    root.querySelectorAll("button[data-m]").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.m===st.m))});
+    root.querySelectorAll("button[data-r]").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.r===st.r))});
+    root.querySelectorAll("button[data-b]").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.b===st.b))});
+  }
+  function drawChart(){
+    var svg=q("chart"),mk=st.m;
+    var pts=st.hist.filter(function(p){return p[mk]!==null&&p[mk]!==undefined}).map(function(p){return{t:p.t,y:p[mk]}});
+    var empty=pts.length<2;
+    q("empty").hidden=!empty;svg.style.display=empty?"none":"block";
+    q("gain").textContent="";
+    if(empty)return;
+    var W=800,H=320,L=76,R=16,T=14,B=34;
+    var t0=pts[0].t,t1=pts[pts.length-1].t,span=t1-t0||1;
+    var mn=Math.min.apply(null,pts.map(function(p){return p.y})),mx=Math.max.apply(null,pts.map(function(p){return p.y}));
+    var pad=(mx-mn)*.12||1;mn=Math.max(0,mn-pad);mx=mx+pad;
+    function X(t){return L+(t-t0)/span*(W-L-R)}
+    function Y(v){return T+(H-T-B)*(1-(v-mn)/(mx-mn))}
+    var h="";
+    niceTicks(mn,mx,4).forEach(function(v){
+      h+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(v)+'" y2="'+Y(v)+'" stroke="var(--line)"/><text x="'+(L-8)+'" y="'+(Y(v)+4)+'" text-anchor="end">'+fmt(v)+'</text>';
+    });
+    for(var i=0;i<=4;i++){
+      var t=t0+span*i/4;
+      h+='<text x="'+X(t)+'" y="'+(H-10)+'" text-anchor="'+(i===0?"start":i===4?"end":"middle")+'">'+stamp(t,span)+'</text>';
+    }
+    h+='<polyline fill="none" stroke="'+COL[mk]+'" stroke-width="2.5" stroke-linejoin="round" points="'+pts.map(function(p){return X(p.t).toFixed(1)+","+Y(p.y).toFixed(1)}).join(" ")+'"/>';
+    h+='<line data-r="hl" y1="'+T+'" y2="'+(H-B)+'" stroke="var(--muted)" stroke-dasharray="4 3" visibility="hidden"/><circle data-r="hc" r="5" fill="'+COL[mk]+'" stroke="var(--surface)" stroke-width="2" visibility="hidden"/>';
+    svg.innerHTML=h;
+    q("gain").textContent="Bertambah "+fmt(pts[pts.length-1].y-pts[0].y)+" "+NAME[mk].toLowerCase()+" sejak "+stamp(t0,span)+".";
+    function move(e){
+      var rc=svg.getBoundingClientRect(),vx=(e.clientX-rc.left)/rc.width*W,best=pts[0],bd=1e9;
+      pts.forEach(function(p){var d=Math.abs(X(p.t)-vx);if(d<bd){bd=d;best=p}});
+      var hl=q("hl"),hc=q("hc");
+      hl.setAttribute("x1",X(best.t));hl.setAttribute("x2",X(best.t));hl.setAttribute("visibility","visible");
+      hc.setAttribute("cx",X(best.t));hc.setAttribute("cy",Y(best.y));hc.setAttribute("visibility","visible");
+      q("readout").textContent=new Date(best.t).toLocaleString("id-ID")+": "+fmt(best.y)+" "+NAME[mk].toLowerCase();
+    }
+    svg.onpointermove=move;svg.onpointerdown=move;
+  }
+  function drawBars(){
+    var svg=q("bars"),mk=st.m,items=st.sum,n=items.length;
+    var vals=items.map(function(x){return x.empty||x[mk]===null||x[mk]===undefined?0:x[mk]});
+    var has=items.some(function(x){return !x.empty&&x[mk]!==null&&x[mk]!==undefined});
+    q("sempty").hidden=has;svg.style.display=has?"block":"none";
+    if(!has){q("sstat").textContent="";return}
+    var total=0,top=null;
+    items.forEach(function(x){if(!x.empty&&x[mk]!==null&&x[mk]!==undefined){total+=x[mk];if(top===null||x[mk]>top[mk])top=x}});
+    q("sstat").textContent="Total tercatat: "+sg(total)+" "+NAME[mk].toLowerCase()+". Tertinggi: "+plabel(top.t,st.b)+" ("+sg(top[mk])+").";
+    var W=800,H=260,L=76,R=12,T=12,B=30,slot=(W-L-R)/n;
+    var mn=Math.min(0,Math.min.apply(null,vals)),mx=Math.max(0,Math.max.apply(null,vals));
+    if(mx===mn)mx=1;
+    var pad=(mx-mn)*.08;if(mx>0)mx+=pad;if(mn<0)mn-=pad;
+    function Y(v){return T+(H-T-B)*(1-(v-mn)/(mx-mn))}
+    var h="";
+    niceTicks(mn,mx,4).forEach(function(v){
+      h+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(v)+'" y2="'+Y(v)+'" stroke="var(--line)"/><text x="'+(L-8)+'" y="'+(Y(v)+4)+'" text-anchor="end">'+fmt(v)+'</text>';
+    });
+    h+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(0)+'" y2="'+Y(0)+'" stroke="var(--muted)"/>';
+    var every=Math.ceil(n/8);
+    items.forEach(function(x,i){
+      var bx=L+i*slot+slot*.15,bw=slot*.7;
+      if(!x.empty&&x[mk]!==null&&x[mk]!==undefined){
+        var y0=Y(0),y1=Y(vals[i]),faded=x.partial||x.gap||x.live;
+        h+='<rect x="'+bx+'" y="'+Math.min(y0,y1)+'" width="'+bw+'" height="'+Math.max(Math.abs(y1-y0),1)+'" rx="2" fill="'+COL[mk]+'" opacity="'+(faded?".45":"1")+'"/>';
+      }
+      if(i%every===0)h+='<text x="'+(bx+bw/2)+'" y="'+(H-10)+'" text-anchor="middle">'+plabel(x.t,st.b,true)+'</text>';
+    });
+    svg.innerHTML=h;
+    function move(e){
+      var rc=svg.getBoundingClientRect(),vx=(e.clientX-rc.left)/rc.width*W;
+      var i=Math.max(0,Math.min(n-1,Math.floor((vx-L)/slot))),x=items[i];
+      q("sread").textContent=plabel(x.t,st.b)+": "+(x.empty?"tidak ada data":sg(x[mk])+" "+NAME[mk].toLowerCase())+(notes(x)&&!x.empty?" ("+notes(x)+")":"");
+    }
+    svg.onpointermove=move;svg.onpointerdown=move;
+  }
+  function drawTable(){
+    var tb=q("stable");tb.innerHTML="";
+    st.sum.slice().reverse().forEach(function(x){
+      var tr=el("tr");tr.appendChild(el("td","",plabel(x.t,st.b)));
+      cfg.metrics.forEach(function(m){tr.appendChild(el("td","n",x.empty?"–":sg(x[m[0]])))});
+      tr.appendChild(el("td","note",notes(x)));tb.appendChild(tr);
+    });
+  }
+  function load(){
+    q("panel").hidden=!st.id;q("spanel").hidden=!st.id;
+    if(!st.id)return Promise.resolve();
+    var id=st.id,b=st.b,r=st.r,k="&kind="+cfg.kind;
+    var p1=api("/api/history?id="+id+"&range="+r+k).then(function(j){if(id===st.id&&r===st.r){st.hist=j.items;drawChart()}}).catch(function(){});
+    var p2=api("/api/summary?id="+id+"&by="+b+"&tz="+new Date().getTimezoneOffset()+k).then(function(j){if(id===st.id&&b===st.b){st.sum=j.items;drawBars();drawTable()}}).catch(function(){});
+    return Promise.all([p1,p2]);
+  }
+  root.addEventListener("click",function(e){
+    var b=e.target.closest("button[data-m],button[data-r],button[data-b]");if(!b)return;
+    if(b.dataset.m){st.m=b.dataset.m;drawChart();drawBars()}
+    if(b.dataset.r){st.r=b.dataset.r;load()}
+    if(b.dataset.b){st.b=b.dataset.b;load()}
+    sync();
+  });
+  return {
+    show:function(id,title){var ch=id!==st.id;st.id=id;q("ptitle").textContent=title||"Grafik";if(ch){st.hist=[];st.sum=[]}return load()}
+  };
+}
+
+/* ---------- Halaman ---------- */
+var TABS={
+  video:{
+    list:"/api/tracked",del:"/api/tracked/",ph:"https://www.youtube.com/watch?v=...",btn:"Tambah video",
+    empty:"Belum ada video. Tambahkan satu untuk mulai.",
+    metrics:[["v","Views","var(--views)"],["l","Like","var(--likes)"],["c","Komentar","var(--comments)"]],
+    viz:null,items:[],sel:null
+  },
+  channel:{
+    list:"/api/channels",del:"/api/channels/",ph:"https://www.youtube.com/@namachannel",btn:"Tambah channel",
+    empty:"Belum ada channel. Tambahkan satu (tautan channel, @handle, atau ID yang diawali UC).",
+    metrics:[["s","Subscriber","var(--likes)"],["v","Total view","var(--views)"],["n","Video","var(--comments)"]],
+    legend:" Angka subscriber dibulatkan oleh YouTube (misalnya 1,23 juta), jadi pertambahan kecil bisa tidak terlihat.",
+    viz:null,items:[],sel:null
+  }
+};
+var tab="video",confirmDel=null;
+TABS.video.viz=makeViz($("vz-video"),{kind:"video",metrics:TABS.video.metrics});
+TABS.channel.viz=makeViz($("vz-channel"),{kind:"channel",metrics:TABS.channel.metrics,legend:TABS.channel.legend});
+
+function renderCards(){
+  var T=TABS[tab],box=$("list");box.innerHTML="";
+  T.items.forEach(function(v){
+    var isCh=tab==="channel";
+    var c=el("article","card"+(isCh?" ch":"")+(v.id===T.sel?" sel":""));
+    var img=el("img");img.alt="";if(v.thumb)img.src=v.thumb;c.appendChild(img);
+    var right=el("div");
+    var h=el("h2"),a=el("a","",v.title||v.id);a.href=isCh?"https://www.youtube.com/channel/"+v.id:"https://youtu.be/"+v.id;a.target="_blank";a.rel="noopener";h.appendChild(a);
+    right.appendChild(h);right.appendChild(el("p","ch",isCh?(v.handle||""):(v.channel||"")));
+    var stt=el("div","stats");
+    T.metrics.forEach(function(m){
+      var k=m[0],s=el("div","stat");s.appendChild(el("small","",m[1]));
+      var hidden=isCh&&k==="s"&&v.latest&&v.latest.s===null;
+      s.appendChild(el("b","",!v.latest?"…":hidden?"Disembunyikan":fmt(v.latest[k])));
+      if(v.latest&&v.prev&&v.latest[k]!==null&&v.prev[k]!==null&&v.latest[k]-v.prev[k]>0)s.appendChild(el("span","delta","+"+fmt(v.latest[k]-v.prev[k])));
+      stt.appendChild(s);
+    });
+    right.appendChild(stt);c.appendChild(right);
+    var acts=el("div","acts");
+    acts.appendChild(el("span","",v.first?"Dicatat sejak "+new Date(v.first.t).toLocaleString("id-ID"):"Menunggu data pertama"));
+    var bar=el("span");
+    var g=el("button","",v.id===T.sel?"Sedang ditampilkan":"Lihat grafik");g.type="button";g.onclick=function(){T.sel=v.id;renderCards();showViz()};
+    bar.appendChild(g);
+    if(confirmDel&&confirmDel.tab===tab&&confirmDel.id===v.id&&Date.now()<confirmDel.until){
+      bar.appendChild(el("span","","  Yakin hapus dari pantauan? "));
+      var yes=el("button","del-yes","Ya, hapus");yes.type="button";yes.style.marginLeft="6px";
+      yes.onclick=function(){confirmDel=null;api(T.del+v.id,{method:"DELETE"}).then(load).catch(function(e){setStatus(e.message,true)})};
+      var no=el("button","","Batal");no.type="button";no.style.marginLeft="6px";
+      no.onclick=function(){confirmDel=null;renderCards()};
+      bar.appendChild(yes);bar.appendChild(no);
+    }else{
+      var d=el("button","del","Hapus…");d.type="button";
+      d.onclick=function(){
+        confirmDel={tab:tab,id:v.id,until:Date.now()+6000};renderCards();
+        setTimeout(function(){if(confirmDel&&Date.now()>=confirmDel.until){confirmDel=null;renderCards()}},6100);
+      };
+      bar.appendChild(d);
+    }
+    acts.appendChild(bar);c.appendChild(acts);
+    box.appendChild(c);
+  });
+}
+function showViz(){
+  var T=TABS[tab],v=T.items.filter(function(x){return x.id===T.sel})[0];
+  return T.viz.show(T.sel,v?v.title:"Grafik");
+}
+function load(){
+  var myTab=tab,T=TABS[tab];
+  return api(T.list).then(function(j){
+    if(myTab!==tab)return;
+    T.items=j.items;
+    if(T.sel&&!T.items.some(function(v){return v.id===T.sel}))T.sel=null;
+    if(!T.sel&&T.items.length)T.sel=T.items[0].id;
+    renderCards();
+    if(!T.items.length)setStatus(T.empty,false,true);
+    else if(j.error)setStatus("Server gagal mengambil data dari YouTube: "+j.error,true);
+    else setStatus("Terhubung. Server mencatat tiap "+j.intervalSeconds+" detik, dan halaman ini ikut diperbarui.");
+    if(window.SNAPSHOT)setStatus(window.SNAPSHOT.statusText||("Salinan data per "+new Date(window.SNAPSHOT.at).toLocaleString("id-ID")+". Server tidak terhubung, jadi angka tidak diperbarui."),false,true);
+    return showViz();
+  }).catch(function(){setStatus("Tidak bisa terhubung ke server. Pastikan jendela hitam (cmd) masih terbuka.",true)});
+}
+function setTab(t){
+  tab=t;confirmDel=null;var T=TABS[t];
+  document.querySelectorAll("button[data-tab]").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.tab===t))});
+  $("vz-video").hidden=t!=="video";$("vz-channel").hidden=t!=="channel";
+  $("url").placeholder=T.ph;$("addbtn").textContent=T.btn;$("url").value="";
+  $("list").innerHTML="";
+  load();
+}
+$("tabs").addEventListener("click",function(e){var b=e.target.closest("button[data-tab]");if(b&&b.dataset.tab!==tab)setTab(b.dataset.tab)});
+
+$("f").onsubmit=function(e){
+  e.preventDefault();
+  var inp=$("url"),T=TABS[tab],myTab=tab;
+  if(tab==="video"){
+    var id=parseId(inp.value);
+    if(!id){setStatus("Tautan atau ID video tidak dikenali. Contoh: https://www.youtube.com/watch?v=dQw4w9WgXcQ",true);return}
+    setStatus("Menambahkan video…",false,true);
+    api("/api/tracked",{method:"POST",body:JSON.stringify({id:id})}).then(function(){inp.value="";T.sel=id;return load()}).catch(function(err){setStatus("Gagal menambah: "+err.message,true)});
+  }else{
+    if(!inp.value.trim()){setStatus("Isi tautan channel, @handle, atau ID channel.",true);return}
+    setStatus("Menambahkan channel…",false,true);
+    api("/api/channels",{method:"POST",body:JSON.stringify({input:inp.value})}).then(function(j){inp.value="";T.sel=j.id;return load()}).catch(function(err){setStatus("Gagal menambah: "+err.message,true)});
+  }
+};
+
+if(window.SNAPSHOT)document.body.classList.add("snap");
+$("exp").href="/api/export?tz="+new Date().getTimezoneOffset();
+setTab("video");
+if(!window.SNAPSHOT||window.SNAPSHOT.live)setInterval(load,15000);
+</script>
+</body>
+</html>
