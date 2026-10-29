@@ -1,6 +1,7 @@
 {
   "videos": [
-    "https://youtube.com"
+    "https://youtube.com",
+    "https://www.youtube.com/watch?v=F7sGJVUrkjQ"
   ],
   "channels": [
     "UCqwUnggBBct-AY2lAdI88jQ",
@@ -24,7 +25,7 @@
       "channel": "UC7Q3HUnJA3nvjZR2JeMn2Cw",
       "include": ["MV"],
       "exclude": ["teaser", "reaction", "behind", "making", "reveal", "highlight", "trailer", "challenge", "out now", "choom", "[", "performance", "dance", "live", "shorts", "#", "hits", "million", "spoiler", "freestyle", "views", "Commentary", "Kia", "BH2ND", "EP."],
-      "max": 50
+      "max": 100
     }
   ]
 }
