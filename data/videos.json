@@ -175,13 +175,6 @@
     "thumb": "https://i.ytimg.com/vi/IR8gXjm507Y/mqdefault.jpg"
   },
   {
-    "id": "v3SQVaG7ej0",
-    "title": "TREASURE - HELLO (Japanese Ver.) M/V",
-    "channel": "TREASURE (트레저)",
-    "publishedAt": "2022-11-23T08:00:33Z",
-    "thumb": "https://i.ytimg.com/vi/v3SQVaG7ej0/mqdefault.jpg"
-  },
-  {
     "id": "Dbs3l_ZJR6o",
     "title": "TREASURE - ‘VolKno’ M/V",
     "channel": "TREASURE (트레저)",
@@ -196,13 +189,6 @@
     "thumb": "https://i.ytimg.com/vi/aPd9exmH17o/mqdefault.jpg"
   },
   {
-    "id": "rP8fq4x2tEo",
-    "title": "TREASURE - JIKJIN (Japanese Ver.) M/V",
-    "channel": "TREASURE (트레저)",
-    "publishedAt": "2022-03-15T15:00:21Z",
-    "thumb": "https://i.ytimg.com/vi/rP8fq4x2tEo/mqdefault.jpg"
-  },
-  {
     "id": "ZJaKdBBzUYk",
     "title": "TREASURE - '직진 (JIKJIN)' M/V",
     "channel": "TREASURE (트레저)",
@@ -210,60 +196,11 @@
     "thumb": "https://i.ytimg.com/vi/ZJaKdBBzUYk/mqdefault.jpg"
   },
   {
-    "id": "OEWK4swwSsA",
-    "title": "TREASURE - '직진 (JIKJIN)' M/V D-DAY CLIP",
-    "channel": "TREASURE (트레저)",
-    "publishedAt": "2022-02-15T03:00:07Z",
-    "thumb": "https://i.ytimg.com/vi/OEWK4swwSsA/mqdefault.jpg"
-  },
-  {
     "id": "UKXeico0yeI",
     "title": "TREASURE - 'BEAUTIFUL' M/V",
     "channel": "TREASURE (트레저)",
     "publishedAt": "2021-03-31T10:00:16Z",
     "thumb": "https://i.ytimg.com/vi/UKXeico0yeI/mqdefault.jpg"
-  },
-  {
-    "id": "DnyYN8ZkBNw",
-    "title": "TREASURE JAPAN DEBUT SPECIAL PROGRAM ～CONGRATS ON JAPANDEBUT & COWNTDOWN BEAUTIFUL M/V ～",
-    "channel": "TREASURE (트레저)",
-    "publishedAt": "2021-03-31T09:30:15Z",
-    "thumb": "https://i.ytimg.com/vi/DnyYN8ZkBNw/mqdefault.jpg"
-  },
-  {
-    "id": "J_1zJ4ka37A",
-    "title": "TREASURE - MY TREASURE (Japanese Ver.) M/V",
-    "channel": "TREASURE (트레저)",
-    "publishedAt": "2021-03-09T15:00:18Z",
-    "thumb": "https://i.ytimg.com/vi/J_1zJ4ka37A/mqdefault.jpg"
-  },
-  {
-    "id": "M_J8awMzJ7Y",
-    "title": "TREASURE - MMM (Japanese Ver.) M/V",
-    "channel": "TREASURE (트레저)",
-    "publishedAt": "2021-03-09T15:00:13Z",
-    "thumb": "https://i.ytimg.com/vi/M_J8awMzJ7Y/mqdefault.jpg"
-  },
-  {
-    "id": "oLstWoMF4Pc",
-    "title": "TREASURE - I LOVE YOU (Japanese Ver.) M/V",
-    "channel": "TREASURE (트레저)",
-    "publishedAt": "2021-03-09T15:00:08Z",
-    "thumb": "https://i.ytimg.com/vi/oLstWoMF4Pc/mqdefault.jpg"
-  },
-  {
-    "id": "VOapML6KyWE",
-    "title": "TREASURE - BOY (Japanese Ver.) M/V",
-    "channel": "TREASURE (트레저)",
-    "publishedAt": "2021-03-09T15:00:01Z",
-    "thumb": "https://i.ytimg.com/vi/VOapML6KyWE/mqdefault.jpg"
-  },
-  {
-    "id": "umW2XcyccRQ",
-    "title": "TREASURE - 'BEAUTIFUL' (Anime M/V)",
-    "channel": "TREASURE (트레저)",
-    "publishedAt": "2021-01-21T15:00:16Z",
-    "thumb": "https://i.ytimg.com/vi/umW2XcyccRQ/mqdefault.jpg"
   },
   {
     "id": "p9LLoijPQfg",
@@ -313,27 +250,6 @@
     "channel": "BABYMONSTER",
     "publishedAt": "2026-06-10T09:00:01Z",
     "thumb": "https://i.ytimg.com/vi/SsuCimm5BIU/mqdefault.jpg"
-  },
-  {
-    "id": "V1t84JWsdtk",
-    "title": "PSYCHO solo performance - PHARITA & AHYEON",
-    "channel": "BABYMONSTER",
-    "publishedAt": "2025-12-12T09:00:20Z",
-    "thumb": "https://i.ytimg.com/vi/V1t84JWsdtk/mqdefault.jpg"
-  },
-  {
-    "id": "gaDP9GDHeVw",
-    "title": "PSYCHO solo performance - RUKA & CHIQUITA",
-    "channel": "BABYMONSTER",
-    "publishedAt": "2025-12-11T09:01:11Z",
-    "thumb": "https://i.ytimg.com/vi/gaDP9GDHeVw/mqdefault.jpg"
-  },
-  {
-    "id": "bYS1zIC3gDE",
-    "title": "PSYCHO solo performance - ASA & RORA",
-    "channel": "BABYMONSTER",
-    "publishedAt": "2025-12-10T09:00:33Z",
-    "thumb": "https://i.ytimg.com/vi/bYS1zIC3gDE/mqdefault.jpg"
   },
   {
     "id": "yAXnEHFKKaY",
@@ -427,6 +343,20 @@
     "thumb": "https://i.ytimg.com/vi/kOanBE5Wg24/mqdefault.jpg"
   },
   {
+    "id": "B17yoLxkbPA",
+    "title": "BABYMONSTER - 'BATTER UP' DANCE PERFORMANCE (DEBUT SPECIAL)",
+    "channel": "BABYMONSTER",
+    "publishedAt": "2023-12-03T15:00:17Z",
+    "thumb": "https://i.ytimg.com/vi/B17yoLxkbPA/mqdefault.jpg"
+  },
+  {
+    "id": "cVUZy1MhGDw",
+    "title": "BABYMONSTER - DANCE PERFORMANCE VIDEO (Jenny from the Block)",
+    "channel": "BABYMONSTER",
+    "publishedAt": "2023-05-25T15:00:04Z",
+    "thumb": "https://i.ytimg.com/vi/cVUZy1MhGDw/mqdefault.jpg"
+  },
+  {
     "id": "DIxRlfHq9Fo",
     "title": "TREASURE – ‘DANGER’ DANCE PERFORMANCE VIDEO",
     "channel": "TREASURE (트레저)",
@@ -483,6 +413,111 @@
     "thumb": "https://i.ytimg.com/vi/GC0FRaUlsNQ/mqdefault.jpg"
   },
   {
+    "id": "uxmzwbGpH30",
+    "title": "TREASURE - ‘B.O.M.B (kaboom ver.)’ DANCE PERFORMANCE VIDEO",
+    "channel": "TREASURE (트레저)",
+    "publishedAt": "2023-10-20T09:00:18Z",
+    "thumb": "https://i.ytimg.com/vi/uxmzwbGpH30/mqdefault.jpg"
+  },
+  {
+    "id": "ehOVBOAtxU4",
+    "title": "TREASURE - ‘B.O.M.B (kaboom ver.)’ WHITE DANCE PERFORMANCE VIDEO",
+    "channel": "TREASURE (트레저)",
+    "publishedAt": "2023-10-20T09:00:04Z",
+    "thumb": "https://i.ytimg.com/vi/ehOVBOAtxU4/mqdefault.jpg"
+  },
+  {
+    "id": "nDhIZIGz0xo",
+    "title": "TREASURE - ‘HELLO’ SPECIAL PERFORMANCE VIDEO",
+    "channel": "TREASURE (트레저)",
+    "publishedAt": "2022-10-20T15:00:06Z",
+    "thumb": "https://i.ytimg.com/vi/nDhIZIGz0xo/mqdefault.jpg"
+  },
+  {
+    "id": "4bBczzrciP0",
+    "title": "TREASURE - 'DARARI (REMIX)' EXCLUSIVE PERFORMANCE VIDEO",
+    "channel": "TREASURE (트레저)",
+    "publishedAt": "2022-05-12T15:03:39Z",
+    "thumb": "https://i.ytimg.com/vi/4bBczzrciP0/mqdefault.jpg"
+  },
+  {
+    "id": "Q5SIYzCRRv4",
+    "title": "TREASURE - '직진 (JIKJIN)' DANCE PERFORMANCE VIDEO",
+    "channel": "TREASURE (트레저)",
+    "publishedAt": "2022-02-23T15:00:25Z",
+    "thumb": "https://i.ytimg.com/vi/Q5SIYzCRRv4/mqdefault.jpg"
+  },
+  {
+    "id": "HBzzYDSDI-U",
+    "title": "TREASURE - ‘음 (MMM)’ DANCE PERFORMANCE VIDEO (HALLOWEEN ver.)",
+    "channel": "TREASURE (트레저)",
+    "publishedAt": "2020-11-13T09:00:03Z",
+    "thumb": "https://i.ytimg.com/vi/HBzzYDSDI-U/mqdefault.jpg"
+  },
+  {
+    "id": "GCPK6u39ZK0",
+    "title": "TREASURE - ‘음 (MMM)’ DANCE PERFORMANCE VIDEO (SPACE SET ver.)",
+    "channel": "TREASURE (트레저)",
+    "publishedAt": "2020-11-12T00:00:01Z",
+    "thumb": "https://i.ytimg.com/vi/GCPK6u39ZK0/mqdefault.jpg"
+  },
+  {
+    "id": "g2i5hKKMaS0",
+    "title": "TREASURE - ‘사랑해 (I LOVE YOU)’ SPECIAL PERFORMANCE VIDEO",
+    "channel": "TREASURE (트레저)",
+    "publishedAt": "2020-10-02T15:00:09Z",
+    "thumb": "https://i.ytimg.com/vi/g2i5hKKMaS0/mqdefault.jpg"
+  },
+  {
+    "id": "EKHd0OgwabY",
+    "title": "TREASURE - ‘BOY’ SPECIAL PERFORMANCE VIDEO",
+    "channel": "TREASURE (트레저)",
+    "publishedAt": "2020-08-20T00:00:03Z",
+    "thumb": "https://i.ytimg.com/vi/EKHd0OgwabY/mqdefault.jpg"
+  },
+  {
+    "id": "OsdZxD3TCSs",
+    "title": "TREASURE : Dance Performance Video (A$AP Rocky - Wild For The Night)",
+    "channel": "TREASURE (트레저)",
+    "publishedAt": "2020-06-25T03:00:06Z",
+    "thumb": "https://i.ytimg.com/vi/OsdZxD3TCSs/mqdefault.jpg"
+  },
+  {
+    "id": "xlq8s8D7_os",
+    "title": "TREASURE : CHOI HYUN SUK x MASHIHO x YOON JAE HYUK Dance Performance Video (Be Like Me - Lil Pump)",
+    "channel": "TREASURE (트레저)",
+    "publishedAt": "2020-04-22T05:02:19Z",
+    "thumb": "https://i.ytimg.com/vi/xlq8s8D7_os/mqdefault.jpg"
+  },
+  {
+    "id": "MEA62eluCuI",
+    "title": "TREASURE : JIHOON x DOYOUNG x SO JUNG HWAN Dance Performance Video (God's Plan - Drake)",
+    "channel": "TREASURE (트레저)",
+    "publishedAt": "2020-04-13T03:00:03Z",
+    "thumb": "https://i.ytimg.com/vi/MEA62eluCuI/mqdefault.jpg"
+  },
+  {
+    "id": "xBncGmi7I_8",
+    "title": "TREASURE : CHOI HYUN SUK x DOYOUNG Dance Performance Video (Babushka Boi - A$AP Rocky)",
+    "channel": "TREASURE (트레저)",
+    "publishedAt": "2020-02-22T03:00:09Z",
+    "thumb": "https://i.ytimg.com/vi/xBncGmi7I_8/mqdefault.jpg"
+  },
+  {
+    "id": "GtCvi67kQ9Y",
+    "title": "TREASURE - 미쳐가네(Going Crazy) PERFORMANCE FILM (emoji ver.)",
+    "channel": "TREASURE (트레저)",
+    "publishedAt": "2020-02-10T03:00:01Z",
+    "thumb": "https://i.ytimg.com/vi/GtCvi67kQ9Y/mqdefault.jpg"
+  },
+  {
+    "id": "u01r0O5WsEo",
+    "title": "TREASURE - 미쳐가네(Going Crazy) PERFORMANCE FILM (4K)",
+    "channel": "TREASURE (트레저)",
+    "publishedAt": "2020-01-30T03:00:06Z",
+    "thumb": "https://i.ytimg.com/vi/u01r0O5WsEo/mqdefault.jpg"
+  },
+  {
     "id": "SAipiNiQff4",
     "title": "CHIQUITA’s solo practice vlog 🐈‍⬛❤️",
     "channel": "BABYMONSTER",
@@ -490,53 +525,11 @@
     "thumb": "https://i.ytimg.com/vi/SAipiNiQff4/mqdefault.jpg"
   },
   {
-    "id": "Cof2_dZwxY8",
-    "title": "RUKA’s solo dance practice🩶",
-    "channel": "BABYMONSTER",
-    "publishedAt": "2026-08-20T10:00:30Z",
-    "thumb": "https://i.ytimg.com/vi/Cof2_dZwxY8/mqdefault.jpg"
-  },
-  {
-    "id": "R5KZon9z5_c",
-    "title": "RUKA’s solo dance practice🩶",
-    "channel": "BABYMONSTER",
-    "publishedAt": "2026-08-20T10:00:03Z",
-    "thumb": "https://i.ytimg.com/vi/R5KZon9z5_c/mqdefault.jpg"
-  },
-  {
-    "id": "a4Scq6U0CvI",
-    "title": "ASA’s solo dance practice🖤",
-    "channel": "BABYMONSTER",
-    "publishedAt": "2026-08-13T12:00:16Z",
-    "thumb": "https://i.ytimg.com/vi/a4Scq6U0CvI/mqdefault.jpg"
-  },
-  {
-    "id": "YzBNFKaAv3M",
-    "title": "ASA’s solo dance practice🖤",
-    "channel": "BABYMONSTER",
-    "publishedAt": "2026-08-13T10:30:01Z",
-    "thumb": "https://i.ytimg.com/vi/YzBNFKaAv3M/mqdefault.jpg"
-  },
-  {
     "id": "lhby9P757tU",
     "title": "PHARITA’s first solo practice vlog 🎤💓",
     "channel": "BABYMONSTER",
     "publishedAt": "2026-08-12T09:00:26Z",
     "thumb": "https://i.ytimg.com/vi/lhby9P757tU/mqdefault.jpg"
-  },
-  {
-    "id": "8Gn8EksHj_8",
-    "title": "CHIQUITA’s solo dance practice 🐈‍⬛",
-    "channel": "BABYMONSTER",
-    "publishedAt": "2026-07-08T10:00:10Z",
-    "thumb": "https://i.ytimg.com/vi/8Gn8EksHj_8/mqdefault.jpg"
-  },
-  {
-    "id": "QqvZAUEOrAQ",
-    "title": "CHIQUITA’s solo dance practice 🐈‍⬛",
-    "channel": "BABYMONSTER",
-    "publishedAt": "2026-07-08T10:00:01Z",
-    "thumb": "https://i.ytimg.com/vi/QqvZAUEOrAQ/mqdefault.jpg"
   },
   {
     "id": "8W5TWR74Mms",
@@ -572,5 +565,68 @@
     "channel": "TREASURE (트레저)",
     "publishedAt": "2025-03-12T09:00:02Z",
     "thumb": "https://i.ytimg.com/vi/NkO_8gCLMZ0/mqdefault.jpg"
+  },
+  {
+    "id": "SkyQR3Tdl_E",
+    "title": "TREASURE - ‘BONA BONA’ DANCE PRACTICE VIDEO",
+    "channel": "TREASURE (트레저)",
+    "publishedAt": "2023-08-01T15:00:05Z",
+    "thumb": "https://i.ytimg.com/vi/SkyQR3Tdl_E/mqdefault.jpg"
+  },
+  {
+    "id": "w9bDxez7YgE",
+    "title": "TREASURE (T5) - 'MOVE' DANCE PRACTICE VIDEO",
+    "channel": "TREASURE (트레저)",
+    "publishedAt": "2023-06-20T15:00:05Z",
+    "thumb": "https://i.ytimg.com/vi/w9bDxez7YgE/mqdefault.jpg"
+  },
+  {
+    "id": "3E7rLh2Jd6Q",
+    "title": "TREASURE - ‘HELLO’ DANCE PRACTICE VIDEO (RAW VERSION)",
+    "channel": "TREASURE (트레저)",
+    "publishedAt": "2022-10-13T15:00:11Z",
+    "thumb": "https://i.ytimg.com/vi/3E7rLh2Jd6Q/mqdefault.jpg"
+  },
+  {
+    "id": "kDkdtNoW9Rw",
+    "title": "TREASURE - ‘HELLO’ DANCE PRACTICE VIDEO",
+    "channel": "TREASURE (트레저)",
+    "publishedAt": "2022-10-08T09:00:02Z",
+    "thumb": "https://i.ytimg.com/vi/kDkdtNoW9Rw/mqdefault.jpg"
+  },
+  {
+    "id": "2bCdVnoztc8",
+    "title": "TREASURE - ‘다라리 (DARARI)’ DANCE PRACTICE VIDEO",
+    "channel": "TREASURE (트레저)",
+    "publishedAt": "2022-04-15T15:00:02Z",
+    "thumb": "https://i.ytimg.com/vi/2bCdVnoztc8/mqdefault.jpg"
+  },
+  {
+    "id": "x0tW4mqmLyU",
+    "title": "TREASURE - ‘MY TREASURE’ DANCE PRACTICE VIDEO",
+    "channel": "TREASURE (트레저)",
+    "publishedAt": "2021-01-18T15:00:32Z",
+    "thumb": "https://i.ytimg.com/vi/x0tW4mqmLyU/mqdefault.jpg"
+  },
+  {
+    "id": "xU9ZA4apPaU",
+    "title": "TREASURE - ‘SBS 2020 K-Pop Awards’ STAGE PRACTICE VIDEO",
+    "channel": "TREASURE (트레저)",
+    "publishedAt": "2020-12-27T03:00:31Z",
+    "thumb": "https://i.ytimg.com/vi/xU9ZA4apPaU/mqdefault.jpg"
+  },
+  {
+    "id": "5-UzO747ruM",
+    "title": "TREASURE - ‘사랑해 (I LOVE YOU)’ DANCE PRACTICE VIDEO",
+    "channel": "TREASURE (트레저)",
+    "publishedAt": "2020-09-28T15:00:02Z",
+    "thumb": "https://i.ytimg.com/vi/5-UzO747ruM/mqdefault.jpg"
+  },
+  {
+    "id": "jMuos6u0cFg",
+    "title": "TREASURE - ‘BOY’ DANCE PRACTICE VIDEO",
+    "channel": "TREASURE (트레저)",
+    "publishedAt": "2020-08-10T00:00:05Z",
+    "thumb": "https://i.ytimg.com/vi/jMuos6u0cFg/mqdefault.jpg"
   }
 ]
