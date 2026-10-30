@@ -7,6 +7,21 @@
 <style>
 :root{--bg:#EEF2F8;--surface:#fff;--ink:#112240;--muted:#5B6B86;--line:#D9E1EE;--views:#D7263D;--likes:#2A6FDB;--comments:#0F9D78;--ok:#0F9D78;color-scheme:light}
 @media (prefers-color-scheme:dark){:root{--bg:#0C1424;--surface:#142039;--ink:#E8EEF9;--muted:#93A3BF;--line:#26365A;--views:#FF5468;--likes:#5B9BFF;--comments:#35C9A0;--ok:#35C9A0;color-scheme:dark}}
+.theme-btn{position:fixed;top:10px;right:10px;z-index:5;padding:6px 10px}
+:root[data-theme="light"]{--bg:#EEF2F8;--surface:#fff;--ink:#112240;--muted:#5B6B86;--line:#D9E1EE;--views:#D7263D;--likes:#2A6FDB;--comments:#0F9D78;--ok:#0F9D78;color-scheme:light}
+:root[data-theme="dark"]{--bg:#0C1424;--surface:#142039;--ink:#E8EEF9;--muted:#93A3BF;--line:#26365A;--views:#FF5468;--likes:#5B9BFF;--comments:#35C9A0;--ok:#35C9A0;color-scheme:dark}
+.mvtools{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.mvtools input{flex:1;min-width:180px}
+.mvrow{display:grid;grid-template-columns:28px 96px 1fr auto auto;align-items:center;gap:12px;width:100%;text-align:left;padding:10px;margin-bottom:8px;background:var(--surface)}
+.mvrow img{width:96px;height:54px;object-fit:cover;border-radius:6px;background:var(--line)}
+.mvrow .rk{color:var(--muted);font-weight:700;text-align:center}
+.mvrow .tt{min-width:0}
+.mvrow .tt b{display:block;font-size:.95rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mvrow small{display:block;color:var(--muted);font-weight:500}
+.mvrow .tot{text-align:right;font-variant-numeric:tabular-nums}
+.mvrow .tot b{display:block}
+.mvrow .up{color:var(--ok);font-size:.8rem;font-weight:600}
+@media(max-width:640px){.mvrow{grid-template-columns:24px 72px 1fr}.mvrow img{width:72px;height:40px}.mvrow .bars,.mvrow .tot{grid-column:3}.mvrow .tot{text-align:left}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5}
 .wrap{max-width:980px;margin:0 auto;padding:24px 16px 48px}
@@ -97,6 +112,7 @@ body:not(.home) #home{display:none}
 </style>
 </head>
 <body>
+<button id="theme" class="theme-btn" type="button" aria-label="Ganti tema terang/gelap">◐</button>
 <div class="wrap">
   <section id="home"></section>
   <h1>Pemantau YouTube</h1>
@@ -440,6 +456,7 @@ function renderCards(){
     }
     box.appendChild(bar3);
   }
+  if(tab==="video"&&!detail){renderRank(box,shown);return}
   shown.forEach(function(v){
     var isCh=tab==="channel";
     var c=el("article","card"+(isCh?" ch":"")+(v.id===T.sel?" sel":""));
@@ -486,6 +503,73 @@ function renderCards(){
     acts.appendChild(bar);c.appendChild(acts);
     box.appendChild(c);
   });
+}
+var nf2=new Intl.NumberFormat("id-ID",{maximumFractionDigits:2});
+function short(n){if(n>=1e9)return nf2.format(n/1e9)+" M";if(n>=1e6)return nf2.format(n/1e6)+" jt";if(n>=1e3)return nf2.format(n/1e3)+" rb";return fmt(n)}
+function nextMile(v){var p=Math.pow(10,Math.floor(Math.log10(v))),m=[1,2,5,10].map(function(k){return k*p}).filter(function(x){return x>v});return m[0]}
+function vStats(v){
+  var arr=((window.SNAPSHOT||{}).vs||{})[v.id]||[],n=arr.length;
+  if(!n||!v.latest)return null;
+  var last=arr[n-1];
+  function at(t){for(var i=n-1;i>=0;i--){if(arr[i].t<=t)return arr[i]}return null}
+  var base=at(last.t-864e5),partial=!base;if(!base)base=arr[0];
+  var g24=last.v!=null&&base.v!=null?last.v-base.v:0;
+  var days=[];
+  for(var d=6;d>=0;d--){var e=last.t-d*864e5,ve=at(e),vb=at(e-864e5)||arr[0];days.push(ve&&ve.v!=null&&vb.v!=null?Math.max(0,ve.v-vb.v):0)}
+  var span=(last.t-base.t)/864e5,rate=span>=1/24?g24/span:0,tgt="";
+  if(rate>0&&last.v>0){var m=nextMile(last.v),dd=Math.ceil((m-last.v)/rate);tgt="🎯 "+short(m)+" · "+(dd>365?"> 1 tahun":"~"+dd+" hari")+" · "+short(m-last.v)+" lagi"}
+  return {v:last.v||0,g24:g24,partial:partial,days:days,tgt:tgt};
+}
+var rk={sort:"total",q:""};
+function renderRank(box,list){
+  var rows=list.map(function(v){return {v:v,s:vStats(v)}});
+  var tv=0,tg=0;rows.forEach(function(r){if(r.s){tv+=r.s.v;tg+=r.s.g24}});
+  var sm=el("div","hstats");
+  [["Total views",fmt(tv)],["Naik 24 jam",sg(tg)]].forEach(function(x){var d=el("div","hstat");d.appendChild(el("small","",x[0]));d.appendChild(el("b","",x[1]));sm.appendChild(d)});
+  box.appendChild(sm);
+  var tools=el("div","mvtools"),inp=el("input");inp.type="search";inp.placeholder="Cari video…";inp.setAttribute("aria-label","Cari video");inp.value=rk.q;
+  tools.appendChild(inp);
+  var seg=el("div","seg");
+  [["total","Total"],["gain","Naik 24 jam"],["channel","Per channel"]].forEach(function(o){
+    var b=el("button","",o[1]);b.type="button";b.setAttribute("aria-pressed",String(rk.sort===o[0]));
+    b.onclick=function(){rk.sort=o[0];seg.querySelectorAll("button").forEach(function(x){x.setAttribute("aria-pressed","false")});b.setAttribute("aria-pressed","true");paint()};
+    seg.appendChild(b);
+  });
+  tools.appendChild(seg);box.appendChild(tools);
+  var wrap=el("div");box.appendChild(wrap);
+  inp.oninput=function(){rk.q=inp.value;paint()};
+  function paint(){
+    wrap.innerHTML="";
+    var q=rk.q.trim().toLowerCase();
+    var L=rows.filter(function(r){return !q||((r.v.title||"")+" "+(r.v.channel||"")).toLowerCase().indexOf(q)>=0});
+    L.sort(function(a,b){
+      var av=a.s?a.s.v:0,bv=b.s?b.s.v:0;
+      if(rk.sort==="gain")return (b.s?b.s.g24:0)-(a.s?a.s.g24:0);
+      if(rk.sort==="channel")return String(a.v.channel||"").localeCompare(String(b.v.channel||""))||bv-av;
+      return bv-av;
+    });
+    if(!L.length){wrap.appendChild(el("p","empty","Tidak ada video yang cocok."));return}
+    L.forEach(function(r,i){
+      var v=r.v,s=r.s,b=el("button","mvrow");b.type="button";
+      b.appendChild(el("span","rk",String(i+1)));
+      var im=el("img");im.alt="";if(v.thumb)im.src=v.thumb;b.appendChild(im);
+      var tt=el("span","tt");tt.appendChild(el("b","",v.title||v.id));tt.appendChild(el("small","",v.channel||""));
+      if(s&&s.tgt)tt.appendChild(el("small","",s.tgt));
+      b.appendChild(tt);
+      var bars=el("span","bars");
+      if(s){var mx=Math.max.apply(null,s.days)||1,h="";s.days.forEach(function(x,k){var bh=Math.max(2,Math.round(x/mx*26));h+='<rect x="'+(k*10)+'" y="'+(28-bh)+'" width="7" height="'+bh+'" rx="1.5" fill="var(--likes)" opacity="'+(k===6?"1":".55")+'"/>'});
+        bars.innerHTML='<svg width="68" height="28" viewBox="0 0 68 28" aria-hidden="true">'+h+'</svg>'}
+      b.appendChild(bars);
+      var tot=el("span","tot");tot.appendChild(el("b","",s?fmt(s.v):"…"));
+      if(s)tot.appendChild(el("span","up",sg(s.g24)+(s.partial?"*":"")+" / 24 jam"));
+      b.appendChild(tot);
+      b.onclick=function(){openVideo(v.id)};
+      wrap.appendChild(b);
+    });
+  }
+  paint();
+  var note=el("p","hnote","Batang = kenaikan 7 hari terakhir. Tanda * berarti pencatatan belum genap 24 jam. Target adalah perkiraan dari laju kenaikan terbaru.");
+  box.appendChild(note);
 }
 function openVideo(id){
   detail=id;TABS.video.sel=id;renderCards();showViz();window.scrollTo(0,0);
@@ -589,6 +673,14 @@ $("f").onsubmit=function(e){
 
 if(window.SNAPSHOT)document.body.classList.add("snap");
 $("exp").href="/api/export?tz="+new Date().getTimezoneOffset();
+(function(){
+  var R=document.documentElement;
+  try{var t=localStorage.getItem("tema");if(t)R.setAttribute("data-theme",t)}catch(e){}
+  $("theme").onclick=function(){
+    var cur=R.getAttribute("data-theme")||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"),nx=cur==="dark"?"light":"dark";
+    R.setAttribute("data-theme",nx);try{localStorage.setItem("tema",nx)}catch(e){}
+  };
+})();
 document.body.classList.add("home");renderHome();
 setTab("video");
 setInterval(function(){if(document.body.classList.contains("home"))renderHome()},15000);
