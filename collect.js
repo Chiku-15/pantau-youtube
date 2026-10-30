@@ -8,6 +8,9 @@ const D = path.join(__dirname, "data");
 fs.mkdirSync(D, { recursive: true });
 const cfg = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json"), "utf8"));
 const MIN_DUR = Number(cfg.minDuration || 0); // detik; video lebih pendek dari ini (mis. Shorts) tidak dicatat. 0 = mati.
+// Judul yang selalu dibuang meski cocok dengan aturan config: vlog member, cover lagu orang lain,
+// versi duplikat (RAW VERSION), dan latihan panggung acara (bukan dance practice biasa).
+const JUNK = /\([^()]*\s-\s[^()]*\)|jenny from the block|a\$ap|lil pump|drake|wild for the night|god's plan|be like me|babushka boi|vlog|raw version|stage practice|sbs 20/i;
 const now = Date.now();
 let failed = 0, recorded = 0;
 
@@ -91,7 +94,7 @@ async function autoVideoIds() {
         const j = await yt("playlistItems", params);
         (j.items || []).forEach((it) => {
           const t = (it.snippet.title || "").toLowerCase();
-          if (inc.some((x) => t.includes(x)) && !exc.some((x) => t.includes(x))) ids.push(it.snippet.resourceId.videoId);
+          if (inc.some((x) => t.includes(x)) && !exc.some((x) => t.includes(x)) && !JUNK.test(t)) ids.push(it.snippet.resourceId.videoId);
         });
         token = j.nextPageToken;
         if (!token) break;
