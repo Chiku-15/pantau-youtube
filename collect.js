@@ -118,7 +118,7 @@ async function autoVideoIds() {
         const j = await yt("videos", { part: "snippet,statistics", id: ids.slice(i, i + 50).join(",") });
         (j.items || []).forEach((v) => {
           const n = (k) => (v.statistics[k] === undefined ? null : Number(v.statistics[k]));
-          metas.push({ id: v.id, title: v.snippet.title, channel: v.snippet.channelTitle,
+          metas.push({ id: v.id, title: v.snippet.title, channel: v.snippet.channelTitle, publishedAt: v.snippet.publishedAt || "",
             thumb: (v.snippet.thumbnails.medium || v.snippet.thumbnails.default).url });
           lines.push(JSON.stringify({ id: v.id, t: now, v: Number(v.statistics.viewCount || 0), l: n("likeCount"), c: n("commentCount") }));
         });
