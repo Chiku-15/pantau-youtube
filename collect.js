@@ -7,6 +7,7 @@ if (!KEY) { console.error("YOUTUBE_API_KEY belum diisi di GitHub Secrets."); pro
 const D = path.join(__dirname, "data");
 fs.mkdirSync(D, { recursive: true });
 const cfg = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json"), "utf8"));
+const MIN_DUR = Number(cfg.minDuration || 0); // detik; video lebih pendek dari ini (mis. Shorts) tidak dicatat. 0 = mati.
 const now = Date.now();
 let failed = 0, recorded = 0;
 
@@ -32,6 +33,7 @@ function videoId(s) {
   } catch (e) { /* abaikan */ }
   return null;
 }
+function durS(iso){const m=/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/.exec(String(iso||""));return m?Number(m[1]||0)*3600+Number(m[2]||0)*60+Number(m[3]||0):null}
 function mapChannel(c) {
   const st = c.statistics || {}, th = (c.snippet && c.snippet.thumbnails) || {};
   return {
@@ -115,8 +117,10 @@ async function autoVideoIds() {
     try {
       const metas = [], lines = [];
       for (let i = 0; i < ids.length; i += 50) {
-        const j = await yt("videos", { part: "snippet,statistics", id: ids.slice(i, i + 50).join(",") });
+        const j = await yt("videos", { part: "snippet,statistics,contentDetails", id: ids.slice(i, i + 50).join(",") });
         (j.items || []).forEach((v) => {
+          const dur = durS(v.contentDetails && v.contentDetails.duration);
+          if (MIN_DUR && dur !== null && dur < MIN_DUR) return; // lewati video terlalu pendek (mis. Shorts)
           const n = (k) => (v.statistics[k] === undefined ? null : Number(v.statistics[k]));
           metas.push({ id: v.id, title: v.snippet.title, channel: v.snippet.channelTitle, publishedAt: v.snippet.publishedAt || "",
             thumb: (v.snippet.thumbnails.medium || v.snippet.thumbnails.default).url });
