@@ -670,7 +670,7 @@ function renderRank(box,list){
   var tools=el("div","mvtools"),inp=el("input");inp.type="search";inp.placeholder="Cari video…";inp.setAttribute("aria-label","Cari video");inp.value=rk.q;
   tools.appendChild(inp);
   var seg=el("div","seg");
-  [["total","Total"],["latest","UP terakhir"],["hot","Populer belakangan ini"]].forEach(function(o){
+  [["total","Total"],["latest","Terbaru"],["hot","Populer belakangan ini"]].forEach(function(o){
     var b=el("button","",o[1]);b.type="button";b.setAttribute("aria-pressed",String(rk.sort===o[0]));
     b.onclick=function(){rk.sort=o[0];seg.querySelectorAll("button").forEach(function(x){x.setAttribute("aria-pressed","false")});b.setAttribute("aria-pressed","true");paint()};
     seg.appendChild(b);
@@ -715,7 +715,7 @@ function renderRank(box,list){
     });
   }
   paint();
-  var note=el("p","hnote","Batang = kenaikan 7 hari terakhir. Tanda * berarti pencatatan belum genap 24 jam. Total = views sepanjang masa · UP terakhir = urut tanggal upload YouTube · Populer belakangan ini = urut kenaikan views 7 hari terakhir.");
+  var note=el("p","hnote","Batang = kenaikan 7 hari terakhir. Tanda * berarti pencatatan belum genap 24 jam. Total = views sepanjang masa · Terbaru = urut tanggal upload YouTube · Populer belakangan ini = urut kenaikan views 7 hari terakhir.");
   box.appendChild(note);
 }
 /* ---------- Halaman detail video (gaya BM Tracker) ---------- */
@@ -975,7 +975,7 @@ function hmZone(c,rows){
   if(mine.length){
     z.appendChild(el("div","zz","Paling banyak ditonton"));
     var g=el("div","hm-grid");
-    mine.slice().sort(function(a,b){return (b.v.latest.v||0)-(a.v.latest.v||0)}).slice(0,4).forEach(function(x,i){g.appendChild(hmCard(x.v,x.s,i+1))});
+    mine.slice().sort(function(a,b){return (b.v.latest.v||0)-(a.v.latest.v||0)}).slice(0,5).forEach(function(x,i){g.appendChild(hmCard(x.v,x.s,i+1))});
     z.appendChild(g);
   }
   return z;
