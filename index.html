@@ -24,7 +24,7 @@
 @media(max-width:640px){.mvrow{grid-template-columns:24px 72px 1fr}.mvrow img{width:72px;height:40px}.mvrow .bars,.mvrow .tot{grid-column:3}.mvrow .tot{text-align:left}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5}
-.wrap{max-width:980px;margin:0 auto;padding:24px 16px 48px}
+.wrap{max-width:1280px;margin:0 auto;padding:24px 16px 48px}
 h1{font-size:clamp(1.4rem,4vw,2rem);margin:0 0 4px;letter-spacing:-.02em}
 .sub{color:var(--muted);margin:0 0 18px}
 #tabs{display:none}
@@ -118,7 +118,11 @@ body:not(.home) #home{display:none}
 .dvs .gn{display:block;font-size:.85rem;font-weight:700;margin-top:4px}
 .dvs small{display:block;color:var(--muted)}
 .dvr{text-align:right}
-.dvm{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:26px;margin-top:18px}
+.dvm{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:26px;margin-top:18px}
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.cgrid>div{min-width:0}
+.btnback{justify-self:start;width:auto}
+@media(max-width:760px){.cgrid{grid-template-columns:1fr}}
 .dvm svg{width:100%;height:auto;display:block;touch-action:pan-y}
 @media(max-width:860px){.dvh{grid-template-columns:1fr 1fr}.dvt{grid-column:1/-1}.dvm{grid-template-columns:1fr}.dvr{text-align:left}}
 .rng{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:8px}
@@ -653,11 +657,13 @@ function buckets(arr,t0,t1,by){
   }
   return out;
 }
-function drawSeries(svg,pts,k,color,t0,t1,fromZero,area,xlab){
-  var W=800,H=xlab?210:190,L=58,R=12,T=10,B=xlab?28:8;
+function drawSeries(svg,pts,k,color,t0,t1,fromZero,area,xlab,W){
+  var H=200,L=58,R=12,T=10,B=28;svg.setAttribute("viewBox","0 0 "+W+" "+H);
   var vals=pts.map(function(p){return p[k]}).filter(function(x){return x!=null});
   if(!vals.length){svg.innerHTML="";return null}
-  var mn=fromZero?0:Math.min.apply(null,vals),mx=Math.max.apply(null,vals);
+  var vmin=Math.min.apply(null,vals),mx=Math.max.apply(null,vals);
+  if(fromZero&&(mx-vmin)<.1*mx)fromZero=false;
+  var mn=fromZero?0:vmin;
   if(fromZero)mx*=1.08;else{var pd=(mx-mn)*.15||Math.max(1,mx*.01);mn=Math.max(0,mn-pd);mx+=pd}
   if(mx<=mn)mx=mn+1;
   var span=t1-t0||1;
@@ -674,9 +680,9 @@ function drawSeries(svg,pts,k,color,t0,t1,fromZero,area,xlab){
   svg.innerHTML=h;
   return {X:X,Y:Y};
 }
-function drawBars(svg,bk,by){
+function drawBars(svg,bk,by,W){
   var n=bk.length;if(!n){svg.innerHTML="";return}
-  var W=800,H=200,L=58,R=12,T=10,B=26,slot=(W-L-R)/n,vals=bk.map(function(b){return b.g});
+  var H=200,L=58,R=12,T=10,B=26,slot=(W-L-R)/n,vals=bk.map(function(b){return b.g});svg.setAttribute("viewBox","0 0 "+W+" "+H);
   var mn=Math.min(0,Math.min.apply(null,vals)),mx=Math.max(0,Math.max.apply(null,vals));
   if(mx===mn)mx=1;mx*=1.08;if(mn<0)mn*=1.08;
   function Y(v){return T+(H-T-B)*(1-(v-mn)/(mx-mn))}
@@ -690,9 +696,10 @@ function drawBars(svg,bk,by){
   });
   svg.innerHTML=h;
 }
+var __rz;window.addEventListener("resize",function(){clearTimeout(__rz);__rz=setTimeout(function(){if(window.__dvp&&detail&&tab==="video"&&document.querySelector(".dvmain"))window.__dvp()},150)});
 function renderDetail(box,v){
   var arr=((window.SNAPSHOT||{}).vs||{})[v.id]||[],T=TABS.video;
-  var back=el("button","","← Katalog");back.type="button";
+  var back=el("button","btnback","← Kembali");back.type="button";
   back.onclick=function(){detail=null;renderCards();window.scrollTo(0,0)};
   box.appendChild(back);
   var root=el("div","");root.style.marginTop="14px";box.appendChild(root);
@@ -734,7 +741,7 @@ function renderDetail(box,v){
      '<div class="rng">'+RNAME.map(function(r){return '<button type="button" data-r="'+r[0]+'" aria-pressed="'+(dt.range===r[0])+'">'+r[1]+'</button>'}).join("")+'</div>'+
      '<div class="dnav"><button type="button" data-n="1" aria-label="Periode sebelumnya"'+(canPrev?"":" disabled")+'>‹</button><div><b>'+label+'</b><small>'+note+(dt.off===0&&dt.range!=="all"?'<span class="lt">TERBARU</span>':'')+'</small></div><button type="button" data-n="-1" aria-label="Periode berikutnya"'+(canNext?"":" disabled")+'>›</button></div>'+
      '<p class="dvro" data-ro>Arahkan kursor ke grafik untuk melihat angka.</p>'+
-     (pts.length>1?'<div class="dl"><i style="background:var(--views)"></i>VIEWS</div><svg class="cv" viewBox="0 0 800 190" '+svgS+'></svg><div class="dl"><i style="background:var(--likes)"></i>LIKE</div><svg class="cl" viewBox="0 0 800 210" '+svgS+'></svg>':'<div class="empty">Data pada rentang ini masih sedikit.</div>')+
+     (pts.length>1?'<div class="cgrid"><div><div class="dl"><i style="background:var(--views)"></i>VIEWS</div><svg class="cv" viewBox="0 0 400 200" '+svgS+'></svg></div><div><div class="dl"><i style="background:var(--likes)"></i>LIKE</div><svg class="cl" viewBox="0 0 400 200" '+svgS+'></svg></div></div>':'<div class="empty">Data pada rentang ini masih sedikit.</div>')+
      '<div class="dvb"><h3>VIEWS BERTAMBAH PER '+(by==="hour"?"JAM":by==="day"?"HARI":"BULAN")+'</h3><svg class="cb" viewBox="0 0 800 200" '+svgS+'></svg>'+
      '<p class="dvro" data-rb>Arahkan kursor ke batang untuk melihat rinciannya.</p>'+
      (big?'<p class="sub" style="margin:4px 0 0">Terbesar sejauh ini: <b style="color:var(--ink)">'+sg(big.g)+'</b> ('+blabel(big.t,by)+')</p>':'')+
@@ -744,9 +751,10 @@ function renderDetail(box,v){
     var ro=main.querySelector("[data-ro]"),rb=main.querySelector("[data-rb]");
     var sV=main.querySelector(".cv"),sL=main.querySelector(".cl");
     if(sV){
-      var gV=drawSeries(sV,pts,"v","var(--views)",t0,t1,true,true,false),gL=drawSeries(sL,pts,"l","var(--likes)",t0,t1,false,false,true);
+      var wC=Math.max(240,Math.floor(sV.getBoundingClientRect().width));
+      var gV=drawSeries(sV,pts,"v","var(--views)",t0,t1,true,true,true,wC),gL=drawSeries(sL,pts,"l","var(--likes)",t0,t1,false,false,true,wC);
       var hov=function(e){
-        var rc=e.currentTarget.getBoundingClientRect(),vx=(e.clientX-rc.left)/rc.width*800,best=pts[0],bd=1e18;
+        var rc=e.currentTarget.getBoundingClientRect(),vx=(e.clientX-rc.left)/rc.width*wC,best=pts[0],bd=1e18;
         pts.forEach(function(p){var d=Math.abs(gV.X(p.t)-vx);if(d<bd){bd=d;best=p}});
         [[sV,gV,"v"],[sL,gL,"l"]].forEach(function(a){
           var g=a[1];if(!g)return;
@@ -758,16 +766,16 @@ function renderDetail(box,v){
       };
       if(gV){[sV,sL].forEach(function(s){s.onpointermove=hov;s.onpointerdown=hov})}
     }
-    var sB=main.querySelector(".cb");drawBars(sB,bk,by);
+    var sB=main.querySelector(".cb"),wB=Math.max(240,Math.floor(sB.getBoundingClientRect().width));drawBars(sB,bk,by,wB);
     var hb=function(e){
       var n=bk.length;if(!n)return;
-      var rc=sB.getBoundingClientRect(),vx=(e.clientX-rc.left)/rc.width*800;
-      var i=Math.max(0,Math.min(n-1,Math.floor((vx-58)/((800-58-12)/n)))),b=bk[i];
+      var rc=sB.getBoundingClientRect(),vx=(e.clientX-rc.left)/rc.width*wB;
+      var i=Math.max(0,Math.min(n-1,Math.floor((vx-58)/((wB-58-12)/n)))),b=bk[i];
       rb.textContent=blabel(b.t,by)+": "+sg(b.g)+" views"+(b.partial?" (pencatatan baru mulai)":b.live?" (periode masih berjalan)":"");
     };
     sB.onpointermove=hb;sB.onpointerdown=hb;
   }
-  paintMain();
+  paintMain();window.__dvp=paintMain;
 
   /* panel kanan: milestone + info */
   var cur=last.v||0,ni=0;while(ni<MSV.length&&MSV[ni]<=cur)ni++;
@@ -783,12 +791,14 @@ function renderDetail(box,v){
   }
   var st0=Math.max(0,ni-3),nodes=MSV.slice(st0,st0+6),sv="";
   nodes.forEach(function(m,i){
-    var x=35+i*70,rd=m<=cur,isN=m===nxt,r=rd?reach(m):null;
-    if(i>0)sv+='<line x1="'+(x-70)+'" x2="'+x+'" y1="14" y2="14" stroke="'+(rd?'var(--views)':'var(--line)')+'" stroke-width="2"/>';
+    var x=30+i*56,rd=m<=cur,isN=m===nxt,r=rd?reach(m):null;
+    if(i>0)sv+='<line x1="'+(x-56)+'" x2="'+x+'" y1="14" y2="14" stroke="'+(rd?'var(--views)':'var(--line)')+'" stroke-width="2"/>';
     sv+='<circle cx="'+x+'" cy="14" r="5" fill="'+(rd?'var(--views)':isN?'var(--surface)':'var(--line)')+'"'+(isN?' stroke="var(--views)" stroke-width="2"':'')+'/>';
     sv+='<text x="'+x+'" y="36" text-anchor="middle" style="fill:var(--ink);font-weight:700">'+ab(m)+'</text>';
     var dtxt=rd?(r&&r.t?(r.est?"~":"")+dvDate(r.t):"sebelum dicatat"):isN?"berikutnya":"";
-    if(dtxt)sv+='<text x="'+x+'" y="52" text-anchor="middle" style="font-size:10px">'+dtxt+'</text>';
+    var d1=dtxt,d2="";if(dtxt==="sebelum dicatat"){d1="sebelum";d2="dicatat"}
+    if(d1)sv+='<text x="'+x+'" y="52" text-anchor="middle" style="font-size:10px">'+d1+'</text>';
+    if(d2)sv+='<text x="'+x+'" y="63" text-anchor="middle" style="font-size:10px">'+d2+'</text>';
   });
   var have={};arr.forEach(function(s){var d=new Date(s.t);d.setHours(0,0,0,0);have[d.getTime()]=1});
   var cd=new Date();cd.setHours(0,0,0,0);
@@ -800,7 +810,7 @@ function renderDetail(box,v){
    (nxt?'<div class="mtop"><b>'+ab(nxt)+' views</b><span>'+(days!==null?'PERKIRAAN <b style="color:var(--ink);font-size:.95rem">'+dvDate(Date.now()+days*864e5,true)+'</b>':'')+'</span></div>'+
    '<div class="pbar"><i style="width:'+Math.max(0,Math.min(100,(cur-prv)/(nxt-prv)*100)).toFixed(1)+'%"></i></div>'+
    '<div class="mrow"><span>'+fmt(left)+' lagi</span><span>'+(days!==null?(days>365?"> 1 tahun":days+" hari"):"–")+'</span></div>':'<p class="sub">Belum ada target berikutnya.</p>')+
-   '<svg viewBox="0 0 420 60" style="margin-top:14px" role="img" aria-label="Jalur milestone">'+sv+'</svg>'+
+   '<svg viewBox="0 0 340 72" style="margin-top:14px" role="img" aria-label="Jalur milestone">'+sv+'</svg>'+
    '<div class="meta"><span class="k">Rilis</span><span>'+(pub?dvDate(pub,true):'–')+'</span>'+
    '<span class="k">Dicatat sejak</span><span>'+dvDate(first.t,true)+' · '+tracked+' hari</span>'+
    '<span class="k">Sampling</span><span>tiap '+Math.max(1,Math.round((S.intervalSeconds||300)/60))+' menit</span>'+
