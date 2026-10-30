@@ -7,7 +7,19 @@
 <style>
 :root{--bg:#EEF2F8;--surface:#fff;--ink:#112240;--muted:#5B6B86;--line:#D9E1EE;--views:#D7263D;--likes:#2A6FDB;--comments:#0F9D78;--ok:#0F9D78;--ac:#2A6FDB;--bm:#D7263D;--bm2:#D9822B;--tr:#2A6FDB;--tr2:#0E9AA7;color-scheme:light}
 @media (prefers-color-scheme:dark){:root{--bg:#0C1424;--surface:#142039;--ink:#E8EEF9;--muted:#93A3BF;--line:#26365A;--views:#FF5468;--likes:#5B9BFF;--comments:#35C9A0;--ok:#35C9A0;--ac:#5B9BFF;--bm:#FF5468;--bm2:#FFA94D;--tr:#5B9BFF;--tr2:#35C9D4;color-scheme:dark}}
-.theme-btn{position:fixed;top:10px;right:10px;z-index:5;padding:6px 10px}
+.theme-btn{padding:7px 11px;border-radius:99px;font-size:1rem;line-height:1;flex:none}
+/* navigasi atas ala website */
+.topnav{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.tn{max-width:1280px;margin:0 auto;padding:9px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{display:inline-flex;align-items:center;gap:9px;font-weight:800;font-size:1.02rem;letter-spacing:-.02em;border:0;background:transparent;color:var(--ink);padding:4px 2px}
+.brand i{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,var(--ac),var(--ok));display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:.62rem;font-style:normal}
+.tn-links{display:flex;gap:2px;margin-left:4px}
+.tn-links button{border:0;background:transparent;color:var(--muted);padding:8px 12px;border-radius:8px;font-weight:600;font-size:.92rem}
+.tn-links button:hover{color:var(--ink);background:var(--surface)}
+.tn-links button[aria-current="true"]{color:var(--ac);background:color-mix(in srgb,var(--ac) 13%,transparent)}
+.tn-search{flex:1;min-width:150px;max-width:330px;margin-left:auto}
+.tn-search input{width:100%;padding:8px 14px;border-radius:99px;font-size:.9rem}
+@media(max-width:680px){.tn-search{display:none}.tn-links{margin-left:auto}}
 :root[data-theme="light"]{--bg:#EEF2F8;--surface:#fff;--ink:#112240;--muted:#5B6B86;--line:#D9E1EE;--views:#D7263D;--likes:#2A6FDB;--comments:#0F9D78;--ok:#0F9D78;--ac:#2A6FDB;--bm:#D7263D;--bm2:#D9822B;--tr:#2A6FDB;--tr2:#0E9AA7;color-scheme:light}
 :root[data-theme="dark"]{--bg:#0C1424;--surface:#142039;--ink:#E8EEF9;--muted:#93A3BF;--line:#26365A;--views:#FF5468;--likes:#5B9BFF;--comments:#35C9A0;--ok:#35C9A0;--ac:#5B9BFF;--bm:#FF5468;--bm2:#FFA94D;--tr:#5B9BFF;--tr2:#35C9D4;color-scheme:dark}
 .mvtools{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
@@ -156,7 +168,38 @@ body:not(.home) #home{display:none}
 .hm-live{display:inline-flex;align-items:center;gap:8px;font-size:.8rem;font-weight:600;color:var(--muted);background:var(--bg);border:1px solid var(--line);padding:5px 13px;border-radius:99px}
 .hm-live i{width:8px;height:8px;border-radius:50%;background:var(--ok);animation:hmPulse 2s infinite}
 @keyframes hmPulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--ok) 60%,transparent)}70%{box-shadow:0 0 0 8px transparent}100%{box-shadow:0 0 0 0 transparent}}
-#home h2.hm-h{font-size:clamp(2rem,4.6vw,3.3rem);line-height:1.08;letter-spacing:-.035em;margin:18px 0 14px}
+#home h2.hm-h{font-size:clamp(1.55rem,3.4vw,2.5rem);line-height:1.12;letter-spacing:-.03em;margin:16px 0 10px}
+/* beranda ringkas: populer + panel kanan */
+.hm-hero{padding:26px 28px}
+.lead{margin:0 0 18px}
+.hm-main{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:14px;align-items:start;margin-top:16px}
+.hm-side{display:grid;gap:14px}
+.hm-box{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;box-shadow:0 14px 34px -24px rgba(0,0,0,.4)}
+.hm-box h3{margin:0;font-size:1.06rem;letter-spacing:-.02em}
+.hsub{color:var(--muted);font-size:.84rem;margin:2px 0 8px}
+.hr-row{display:grid;grid-template-columns:22px 96px minmax(0,1fr) auto;gap:12px;align-items:center;padding:7px 8px;border-radius:10px;width:100%;text-align:left;background:transparent;border:0;transition:background .15s}
+.hr-row:hover{background:var(--bg)}
+.hr-row img,.hr-row .th{width:96px;height:54px;border-radius:8px;object-fit:cover;background:var(--line)}
+.hr-row .rk{color:var(--muted);font-weight:800;text-align:center}
+.hr-row .ti{min-width:0}
+.hr-row .ti b{display:block;font-size:.9rem;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hr-row .ti small{display:block;color:var(--muted);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hr-row .n{text-align:right;font-variant-numeric:tabular-nums;flex:none}
+.hr-row .n b{display:block;font-size:.98rem}
+.hr-row .n em{display:block;color:var(--ok);font-style:normal;font-size:.76rem;font-weight:700}
+.hm-more2{width:100%;margin-top:10px;padding:10px;border-radius:10px;font-weight:700}
+.hm-kc{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:9px 11px;border-radius:12px;background:var(--bg);border:1px solid var(--line);margin-bottom:8px;transition:transform .15s,border-color .15s}
+.hm-kc:last-child{margin-bottom:0}
+.hm-kc:hover{border-color:var(--ac);transform:translateY(-1px)}
+.hm-kc .ic{width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;font-size:1.15rem;border-radius:10px;background:color-mix(in srgb,var(--ac) 15%,transparent);flex:none}
+.hm-kc .av{width:38px;height:38px;border-radius:50%;object-fit:cover;background:var(--line);flex:none}
+.hm-kc .tx{min-width:0;flex:1}
+.hm-kc .tx b{display:block;font-size:.97rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hm-kc .tx small{display:block;color:var(--muted);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hm-kc .ar{color:var(--muted);font-weight:800;flex:none}
+.hm-foot{margin-top:14px}
+@media(max-width:920px){.hm-main{grid-template-columns:1fr}}
+@media(max-width:560px){.hr-row{grid-template-columns:18px 84px minmax(0,1fr) auto;gap:9px;padding:7px 4px}.hr-row img,.hr-row .th{width:84px;height:47px}.hr-row .n b{font-size:.88rem}.hr-row .n em{font-size:.68rem}.hm-more2{padding:9px}.hr-row .ti b{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}.hr-row .ti small{white-space:normal}}
 .hm-gr{background:linear-gradient(90deg,var(--ac),var(--ok));-webkit-background-clip:text;background-clip:text;color:transparent}
 .hm-cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
 .hm-cta button{padding:12px 20px;border-radius:10px}
@@ -172,9 +215,9 @@ body:not(.home) #home{display:none}
 .hm-feat .nums b span{font-size:.85rem;color:var(--muted);font-weight:600}
 .hm-feat em,.hmn em{font-style:normal;color:var(--ok);font-weight:700;font-size:.85rem}
 .hm-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:16px 0 0}
-.hm-stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.hm-stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
 .hm-stat small{display:block;color:var(--muted);font-size:.8rem}
-.hm-stat b{display:block;font-size:1.45rem;font-variant-numeric:tabular-nums;letter-spacing:-.02em;margin-top:2px}
+.hm-stat b{display:block;font-size:1.35rem;font-variant-numeric:tabular-nums;letter-spacing:-.02em;margin-top:2px}
 .hm-stat.acc b{color:var(--ok)}
 .hm-sec{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin:38px 0 14px}
 .hm-sec h3{font-size:1.3rem;margin:0;letter-spacing:-.02em}
@@ -243,14 +286,23 @@ body:not(.home) #home{display:none}
 .hm-panel{background:var(--bg);border:1px solid var(--line);border-radius:16px;padding:20px 22px;box-shadow:0 18px 40px -22px rgba(0,0,0,.45)}
 .hm-panel .l{display:block;color:var(--muted);font-weight:800;letter-spacing:.12em;font-size:.7rem}
 .hm-panel .pn{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:6px 0 16px}
-.hm-panel .pn b{font-size:clamp(1.9rem,4vw,2.7rem);letter-spacing:-.03em;font-variant-numeric:tabular-nums;color:var(--ok)}
+.hm-panel .pn b{font-size:clamp(1.5rem,3vw,2rem);letter-spacing:-.03em;font-variant-numeric:tabular-nums;color:var(--ok)}
 .hm-panel .pn span{color:var(--muted)}
-.hm-panel svg{width:100%;height:150px;display:block}
+.hm-panel svg{width:100%;height:100px;display:block}
 .hm-panel .pl{display:flex;justify-content:space-between;color:var(--muted);font-size:.78rem;margin-top:8px}
 </style>
 </head>
 <body>
-<button id="theme" class="theme-btn" type="button" aria-label="Ganti tema terang/gelap">◐</button>
+<nav class="topnav" aria-label="Navigasi utama"><div class="tn">
+  <button class="brand" id="navb" type="button"><i aria-hidden="true">▶</i>Pemantau YouTube</button>
+  <div class="tn-links" id="tnlinks">
+    <button type="button" data-nav="home" aria-current="true">Beranda</button>
+    <button type="button" data-nav="rank">Peringkat</button>
+    <button type="button" data-nav="chan">Channel</button>
+  </div>
+  <form class="tn-search" id="tnsearch" role="search"><input id="tnq" type="search" placeholder="Cari video…" aria-label="Cari video"></form>
+  <button id="theme" class="theme-btn" type="button" aria-label="Ganti tema terang/gelap">◐</button>
+</div></nav>
 <div class="wrap">
   <section id="home"></section>
   <h1>Pemantau YouTube</h1>
@@ -656,9 +708,12 @@ function vStats(v){
 var rk={sort:"total",q:"",cat:"all"};
 var CATS=[["all","Semua"],["mv","MV"],["dp","Dance Performance"],["dpr","Dance Practice"]];
 var CATN={mv:"MV",dp:"Dance Performance",dpr:"Dance Practice"};
-function catOf(v){var t=(v.title||"").toLowerCase();if(/practice/.test(t))return"dpr";if(/performance/.test(t))return"dp";if(/m\/v|\bmv\b/.test(t))return"mv";return null}
+// Judul video sampah: vlog member, cover lagu orang lain, versi duplikat, latihan panggung acara.
+// Sama dengan JUNK di collect.js — video ini disembunyikan dari semua daftar.
+var JUNK=/\([^()]*\s-\s[^()]*\)|jenny from the block|a\$ap|lil pump|drake|wild for the night|god's plan|be like me|babushka boi|vlog|raw version|stage practice|sbs 20/i;
+function catOf(v){var t=(v.title||"").toLowerCase();if(JUNK.test(t))return null;if(/practice/.test(t))return"dpr";if(/performance/.test(t))return"dp";if(/m\/v|\bmv\b/.test(t))return"mv";return null}
 function renderRank(box,list){
-  var rows=list.map(function(v){return {v:v,s:vStats(v)}});
+  var rows=list.filter(function(v){return !JUNK.test((v.title||"").toLowerCase())}).map(function(v){return {v:v,s:vStats(v)}});
   var sm=el("div","hstats"),sb=[];
   ["Total views","Naik 24 jam"].forEach(function(x){var d=el("div","hstat"),b=el("b","","…");d.appendChild(el("small","",x));d.appendChild(b);sb.push(b);sm.appendChild(d)});
   box.appendChild(sm);
@@ -958,84 +1013,74 @@ function hmPanel(vs,tg){
 function themeOf(n){n=n||"";if(/treasure|트레저/i.test(n))return"tr";if(/babymonster/i.test(n))return"bm";return null}
 function applyTheme(n){var t=themeOf(n);document.body.classList.remove("th-bm","th-tr");if(t)document.body.classList.add("th-"+t)}
 function openChannelList(name,cat){rk.cat=cat||"all";chFilter=name;leaveHome();renderCards()}
-function hmZone(c,rows){
-  var th=themeOf(c.title),mine=rows.filter(function(x){return x.v.channel===c.title}),tv=0,tg=0;
-  mine.forEach(function(x){tv+=x.v.latest.v||0;if(x.s)tg+=x.s.g24});
-  var z=el("section","hm-zone"+(th?" th-"+th:"")),h=el("div","zh");
-  h.innerHTML=(c.thumb?'<img alt="" src="'+escH(c.thumb)+'">':'')+'<div class="zt"><h3>'+escH(c.title||c.id)+'</h3><small>'+(c.latest?(c.latest.s===null?"Subscriber disembunyikan":fmt(c.latest.s)+" subscriber"):"Menunggu data")+'</small></div>';
-  var go=el("button","zgo","Lihat semua video →");go.type="button";go.onclick=function(){openChannelList(c.title,"all")};h.appendChild(go);z.appendChild(h);
-  var zs=el("div","zs");
-  [["Video dipantau",fmt(mine.length)],["Total views",fmt(tv)],["Naik 24 jam",sg(tg),1]].forEach(function(x){var d=el("div",x[2]?"up":"");d.appendChild(el("small","",x[0]));d.appendChild(el("b","",x[1]));zs.appendChild(d)});
-  z.appendChild(zs);
-  var zc=el("div","zc");
-  HMCATS.forEach(function(k){
-    var sub=mine.filter(function(x){return catOf(x.v)===k[0]}),sv=0;sub.forEach(function(x){sv+=x.v.latest.v||0});
-    var b=el("button","");b.type="button";
-    b.innerHTML='<span class="ic">'+k[1]+'</span><span><b>'+k[2]+'</b><small>'+sub.length+' video · '+short(sv)+' views</small></span>';
-    b.onclick=function(){openChannelList(c.title,k[0])};zc.appendChild(b);
-  });
-  z.appendChild(zc);
-  if(mine.length){
-    z.appendChild(el("div","zz","Paling banyak ditonton"));
-    HMCATS.forEach(function(k){
-      var sub=mine.filter(function(x){return catOf(x.v)===k[0]});
-      if(!sub.length)return;
-      sub=sub.slice().sort(function(a,b){return (b.v.latest.v||0)-(a.v.latest.v||0)}).slice(0,4);
-      var w=el("div","hm-cat");
-      w.appendChild(el("div","zzz",k[1]+" "+k[2]));
-      var g=el("div","hm-grid");
-      sub.forEach(function(x,i){g.appendChild(hmCard(x.v,x.s,i+1))});
-      w.appendChild(g);
-      z.appendChild(w);
-    });
-  }
-  return z;
-}
 var HMCATS=[["mv","🎬","MV","Video musik resmi"],["dp","💃","Dance Performance","Penampilan koreografi"],["dpr","🕺","Dance Practice","Latihan tari"]];
 function goList(cat){rk.cat=cat||"all";chFilter=null;leaveHome();renderCards()}
-function hmSec(box,title,sub,btn,fn){
-  var d=el("div","hm-sec"),l=el("div");l.appendChild(el("h3","",title));if(sub)l.appendChild(el("small","",sub));d.appendChild(l);
-  if(btn){var b=el("button","hm-more",btn);b.type="button";b.onclick=fn;d.appendChild(b)}
-  box.appendChild(d);
-}
-function hmCard(v,s,rank){
-  var b=el("button","hmc"+(themeOf(v.channel)?" th-"+themeOf(v.channel):"")),cat=catOf(v);b.type="button";
-  b.innerHTML='<span class="hmt">'+(v.thumb?'<img alt="" loading="lazy" src="'+escH(v.thumb)+'">':'')+(rank?'<i class="hmr">#'+rank+'</i>':'')+(cat?'<i class="hmb">'+SHORTC[cat]+'</i>':'')+'</span>'+
-   '<span class="hmx"><b>'+escH(v.title||v.id)+'</b><small>'+escH(v.channel||"")+'</small><span class="hmn"><b>'+fmt(s?s.v:v.latest.v)+'</b>'+(s&&s.g24>0?'<em>'+sg(s.g24)+'</em>':'')+'</span></span>';
-  b.onclick=function(){leaveHome();openVideo(v.id)};
-  return b;
-}
 function renderHome(){
   return Promise.all([api("/api/tracked"),api("/api/channels")]).then(function(r){
-    var vs=r[0].items.filter(function(x){return x.latest}),chs=r[1].items,box=$("home");
+    var vs=r[0].items.filter(function(x){return x.latest&&!JUNK.test((x.title||"").toLowerCase())}),chs=r[1].items,box=$("home");
     var rows=vs.map(function(v){return {v:v,s:vStats(v)}}),tv=0,tg=0,last=0;
     rows.forEach(function(x){tv+=x.v.latest.v||0;if(x.s)tg+=x.s.g24;last=Math.max(last,x.v.latest.t)});
     var subs=chs.reduce(function(a,x){return a+((x.latest&&x.latest.s)||0)},0);
-    var byGain=rows.filter(function(x){return x.s&&x.s.g24>0}).sort(function(a,b){return b.s.g24-a.s.g24});
     var byViews=rows.slice().sort(function(a,b){return (b.v.latest.v||0)-(a.v.latest.v||0)});
-    var top=byGain[0]||byViews[0];
     box.innerHTML="";box.className=hmSeen?"":"hm-anim";hmSeen=true;applyTheme(null);
-    /* hero */
+    /* hero ringkas */
     var hero=el("section","hm-hero"),tx=el("div");
     tx.innerHTML='<span class="hm-live"><i></i>Live'+(last?' · diperbarui '+new Date(last).toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"}):'')+'</span>'+
-     '<h2 class="hm-h">Pantau <span class="hm-gr">views, like &amp; milestone</span> video favoritmu</h2>'+
-     '<p class="lead">Data dicatat otomatis setiap beberapa menit lalu ditampilkan sebagai grafik yang mudah dibaca, dari MV sampai dance practice.</p>';
-    var cta=el("div","hm-cta"),b1=el("button","pri","Lihat semua video →");b1.type="button";b1.onclick=function(){goList("all")};
-    var b2=el("button","","Lihat channel");b2.type="button";b2.onclick=function(){var t=$("hm-ch");if(t)t.scrollIntoView({behavior:"smooth",block:"center"})};
+     '<h2 class="hm-h">Jelajahi <span class="hm-gr">data views</span> video favoritmu</h2>'+
+     '<p class="lead">Views, like dan kenaikan harian dicatat otomatis, lalu ditampilkan ringkas di sini.</p>';
+    var cta=el("div","hm-cta"),b1=el("button","pri","Lihat peringkat video →");b1.type="button";b1.onclick=function(){goList("all")};
+    var b2=el("button","","Channel dipantau");b2.type="button";b2.onclick=function(){var t=$("hm-chz");if(t)t.scrollIntoView({behavior:"smooth",block:"center"})};
     cta.appendChild(b1);cta.appendChild(b2);tx.appendChild(cta);hero.appendChild(tx);
     hero.appendChild(hmPanel(vs,tg));
     box.appendChild(hero);
-    /* statistik */
+    /* statistik ringkas */
     var st=el("div","hm-stats");
-    [["Channel dipantau",fmt(chs.length)],["Video dipantau",fmt(vs.length)],["Total subscriber",fmt(subs)],["Total views",fmt(tv)],["Naik 24 jam",sg(tg),1]].forEach(function(x){
+    [["Video dipantau",fmt(vs.length)],["Total views",fmt(tv)],["Naik 24 jam",sg(tg),1],["Subscriber",fmt(subs)]].forEach(function(x){
       var d=el("div","hm-stat"+(x[2]?" acc":""));d.appendChild(el("small","",x[0]));d.appendChild(el("b","",x[1]));st.appendChild(d);
     });
     box.appendChild(st);
-    /* zona per channel */
-    var zw=el("div");zw.id="hm-ch";
-    chs.forEach(function(c){zw.appendChild(hmZone(c,rows))});
-    box.appendChild(zw);
-    if(last)box.appendChild(el("p","hnote","Catatan terakhir: "+new Date(last).toLocaleString("id-ID")));
+    /* konten utama: daftar terpopuler + panel kanan */
+    var main=el("div","hm-main"),lp=el("div","hm-box"),rp=el("div","hm-side");
+    lp.appendChild(el("h3","","🔥 Terpopuler sepanjang masa"));
+    lp.appendChild(el("p","hsub","Lima video dengan views terbanyak dari semua channel."));
+    byViews.slice(0,5).forEach(function(x,i){
+      var cat=catOf(x.v),b=el("button","hr-row");b.type="button";
+      b.innerHTML='<span class="rk">'+(i+1)+'</span>'+
+       (x.v.thumb?'<img alt="" loading="lazy" src="'+escH(x.v.thumb)+'">':'<span class="th"></span>')+
+       '<span class="ti"><b>'+escH(x.v.title||x.v.id)+'</b><small>'+escH(x.v.channel||"")+(cat?" · "+CATN[cat]:"")+'</small></span>'+
+       '<span class="n"><b>'+fmt(x.v.latest.v)+'</b>'+(x.s&&x.s.g24>0?'<em>+'+short(x.s.g24)+' / 24 jam</em>':'')+'</span>';
+      b.onclick=function(){leaveHome();openVideo(x.v.id)};
+      lp.appendChild(b);
+    });
+    var more=el("button","hm-more2","Lihat semua video →");more.type="button";more.onclick=function(){goList("all")};lp.appendChild(more);
+    main.appendChild(lp);
+    /* kanan: kategori */
+    var kc=el("div","hm-box");
+    kc.appendChild(el("h3","","🗂️ Jelajah kategori"));
+    kc.appendChild(el("p","hsub","Buka daftar video per jenis."));
+    HMCATS.forEach(function(k){
+      var n=rows.filter(function(x){return catOf(x.v)===k[0]}).length;
+      var b=el("button","hm-kc");b.type="button";
+      b.innerHTML='<span class="ic" aria-hidden="true">'+k[1]+'</span><span class="tx"><b>'+k[2]+'</b><small>'+k[3]+' · '+n+' video</small></span><span class="ar" aria-hidden="true">→</span>';
+      b.onclick=function(){goList(k[0])};
+      kc.appendChild(b);
+    });
+    rp.appendChild(kc);
+    /* kanan: channel */
+    var kz=el("div","hm-box");kz.id="hm-chz";
+    kz.appendChild(el("h3","","📡 Channel dipantau"));
+    kz.appendChild(el("p","hsub","Lihat daftar video dari channel ini."));
+    chs.forEach(function(c){
+      var mine=rows.filter(function(x){return x.v.channel===c.title}),sv=0;mine.forEach(function(x){sv+=x.v.latest.v||0});
+      var b=el("button","hm-kc");b.type="button";
+      b.innerHTML=(c.thumb?'<img class="av" alt="" src="'+escH(c.thumb)+'">':'<span class="ic" aria-hidden="true">▶</span>')+
+       '<span class="tx"><b>'+escH(c.title||c.id)+'</b><small>'+(c.latest&&c.latest.s!==null?short(c.latest.s)+" subscriber · ":c.latest?"Subscriber disembunyikan · ":"")+mine.length+' video</small></span><span class="ar" aria-hidden="true">→</span>';
+      b.onclick=function(){openChannelList(c.title,"all")};
+      kz.appendChild(b);
+    });
+    rp.appendChild(kz);
+    main.appendChild(rp);box.appendChild(main);
+    if(last)box.appendChild(el("p","hnote hm-foot","Catatan terakhir: "+new Date(last).toLocaleString("id-ID")+" · Angka diperbarui otomatis kira-kira tiap 5 menit."));
   }).catch(function(){});
 }
 function goChannel(name){
@@ -1068,6 +1113,22 @@ $("f").onsubmit=function(e){
     setStatus("Menambahkan channel…",false,true);
     api("/api/channels",{method:"POST",body:JSON.stringify({input:inp.value})}).then(function(j){inp.value="";T.sel=j.id;return load()}).catch(function(err){setStatus("Gagal menambah: "+err.message,true)});
   }
+};
+
+/* ---------- Navigasi atas ---------- */
+function navGo(w){
+  document.querySelectorAll("#tnlinks button").forEach(function(b){b.setAttribute("aria-current",String(b.dataset.nav===w))});
+  if(w==="home"){document.body.classList.add("home");renderHome();window.scrollTo(0,0)}
+  else if(w==="rank"){goList("all")}
+  else{chFilter=null;detail=null;setTab("channel");window.scrollTo(0,0)}
+}
+$("navb").onclick=function(){navGo("home")};
+document.querySelectorAll("#tnlinks button").forEach(function(b){b.onclick=function(){navGo(b.dataset.nav)}});
+$("tnsearch").onsubmit=function(e){
+  e.preventDefault();
+  rk.q=$("tnq").value.trim();
+  goList("all");
+  window.scrollTo(0,0);
 };
 
 if(window.SNAPSHOT)document.body.classList.add("snap");
