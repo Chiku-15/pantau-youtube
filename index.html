@@ -236,6 +236,9 @@ body:not(.home) #home{display:none}
 .zc b{display:block}
 .zc small{display:block;color:var(--muted);font-weight:500}
 .zz{margin:20px 0 10px;font-size:1rem;font-weight:700}
+.hm-cat{margin-top:14px}
+.hm-cat:first-of-type{margin-top:0}
+.zzz{margin:2px 0 8px;font-size:.85rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
 @media(prefers-reduced-motion:reduce){.zc button{transition:none}}
 .hm-panel{background:var(--bg);border:1px solid var(--line);border-radius:16px;padding:20px 22px;box-shadow:0 18px 40px -22px rgba(0,0,0,.45)}
 .hm-panel .l{display:block;color:var(--muted);font-weight:800;letter-spacing:.12em;font-size:.7rem}
@@ -974,9 +977,17 @@ function hmZone(c,rows){
   z.appendChild(zc);
   if(mine.length){
     z.appendChild(el("div","zz","Paling banyak ditonton"));
-    var g=el("div","hm-grid");
-    mine.slice().sort(function(a,b){return (b.v.latest.v||0)-(a.v.latest.v||0)}).slice(0,5).forEach(function(x,i){g.appendChild(hmCard(x.v,x.s,i+1))});
-    z.appendChild(g);
+    HMCATS.forEach(function(k){
+      var sub=mine.filter(function(x){return catOf(x.v)===k[0]});
+      if(!sub.length)return;
+      sub=sub.slice().sort(function(a,b){return (b.v.latest.v||0)-(a.v.latest.v||0)}).slice(0,4);
+      var w=el("div","hm-cat");
+      w.appendChild(el("div","zzz",k[1]+" "+k[2]));
+      var g=el("div","hm-grid");
+      sub.forEach(function(x,i){g.appendChild(hmCard(x.v,x.s,i+1))});
+      w.appendChild(g);
+      z.appendChild(w);
+    });
   }
   return z;
 }
