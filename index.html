@@ -232,6 +232,7 @@ function arrOf(S,kind,id){return ((kind==="channel"?S.cs:S.vs)[id])||[]}
 function refresh(){
   return Promise.all([get("data/videos.json"),get("data/channels.json"),get("data/samples.jsonl",1),get("data/channel_samples.jsonl",1)]).then(function(a){
     var vs=group(jl(a[2])),cs=group(jl(a[3])),last=0;
+    [vs,cs].forEach(function(m){Object.keys(m).forEach(function(k){m[k].sort(function(x,y){return x.t-y.t})})});
     function items(list,m){return list.map(function(v){var arr=m[v.id]||[];if(arr.length)last=Math.max(last,arr[arr.length-1].t);return Object.assign({},v,{latest:arr[arr.length-1]||null,prev:arr[arr.length-2]||null,first:arr[0]||null})})}
     var S=window.SNAPSHOT=window.SNAPSHOT||{live:true,intervalSeconds:300,error:null};
     S.tracked=items(a[0],vs);S.channels=items(a[1],cs);S.vs=vs;S.cs=cs;S.at=Date.now();
