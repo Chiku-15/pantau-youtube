@@ -670,7 +670,7 @@ function renderRank(box,list){
   var tools=el("div","mvtools"),inp=el("input");inp.type="search";inp.placeholder="Cari video…";inp.setAttribute("aria-label","Cari video");inp.value=rk.q;
   tools.appendChild(inp);
   var seg=el("div","seg");
-  [["total","Total"],["gain","Naik 24 jam"],["channel","Per channel"]].forEach(function(o){
+  [["total","Total"],["latest","UP terakhir"],["hot","Populer belakangan ini"]].forEach(function(o){
     var b=el("button","",o[1]);b.type="button";b.setAttribute("aria-pressed",String(rk.sort===o[0]));
     b.onclick=function(){rk.sort=o[0];seg.querySelectorAll("button").forEach(function(x){x.setAttribute("aria-pressed","false")});b.setAttribute("aria-pressed","true");paint()};
     seg.appendChild(b);
@@ -687,8 +687,8 @@ function renderRank(box,list){
     var L=inCat.filter(function(r){return !q||((r.v.title||"")+" "+(r.v.channel||"")).toLowerCase().indexOf(q)>=0});
     L.sort(function(a,b){
       var av=a.s?a.s.v:0,bv=b.s?b.s.v:0;
-      if(rk.sort==="gain")return (b.s?b.s.g24:0)-(a.s?a.s.g24:0);
-      if(rk.sort==="channel")return String(a.v.channel||"").localeCompare(String(b.v.channel||""))||bv-av;
+      if(rk.sort==="latest"){var ap=pubOf(a.v)||0,bp=pubOf(b.v)||0;return bp-ap||bv-av}
+      if(rk.sort==="hot")return v7(b.v)-v7(a.v)||bv-av;
       return bv-av;
     });
     if(!L.length){wrap.appendChild(el("p","empty","Tidak ada video yang cocok."));return}
@@ -704,14 +704,18 @@ function renderRank(box,list){
         bars.innerHTML='<svg width="68" height="28" viewBox="0 0 68 28" aria-hidden="true">'+h+'</svg>'}
       b.appendChild(bars);
       var tot=el("span","tot");tot.appendChild(el("b","",s?fmt(s.v):"…"));
-      if(s)tot.appendChild(el("span","up",sg(s.g24)+(s.partial?"*":"")+" / 24 jam"));
+      if(s){
+        if(rk.sort==="latest"){var p=pubOf(v);tot.appendChild(el("span","up",p?"UP "+dvDate(p,1)+" · "+upAgo(p):"UP –"))}
+        else if(rk.sort==="hot")tot.appendChild(el("span","up","+"+short(v7(v))+" / 7 hari"));
+        else tot.appendChild(el("span","up",sg(s.g24)+(s.partial?"*":"")+" / 24 jam"));
+      }
       b.appendChild(tot);
       b.onclick=function(){openVideo(v.id)};
       wrap.appendChild(b);
     });
   }
   paint();
-  var note=el("p","hnote","Batang = kenaikan 7 hari terakhir. Tanda * berarti pencatatan belum genap 24 jam. Target adalah perkiraan dari laju kenaikan terbaru.");
+  var note=el("p","hnote","Batang = kenaikan 7 hari terakhir. Tanda * berarti pencatatan belum genap 24 jam. Total = views sepanjang masa · UP terakhir = urut tanggal upload YouTube · Populer belakangan ini = urut kenaikan views 7 hari terakhir.");
   box.appendChild(note);
 }
 /* ---------- Halaman detail video (gaya BM Tracker) ---------- */
@@ -727,6 +731,7 @@ function pubOf(v){var p=v.publishedAt||v.published||v.publishDate||v.date||v.rel
 function atT(arr,t){var lo=0,hi=arr.length;while(lo<hi){var m=(lo+hi)>>1;if(arr[m].t<=t)lo=m+1;else hi=m}return lo?arr[lo-1]:null}
 function gainBetween(arr,k,t0,t1){var a=atT(arr,t0)||arr[0],b=atT(arr,t1);if(!a||!b||a[k]==null||b[k]==null)return null;return b[k]-a[k]}
 function ageStr(ms){var d=Math.max(0,Math.floor((Date.now()-ms)/864e5));if(d<30)return d+" hari";var m=Math.floor(d/30.44);return m+" bln "+Math.round(d-m*30.44)+" hr"}
+function upAgo(ms){var d=Math.floor((Date.now()-ms)/864e5);if(d<=0)return "hari ini";if(d===1)return "kemarin";return ageStr(ms)+" lalu"}
 function rankOf(list,fn,id){var s=list.slice().sort(function(a,b){return fn(b)-fn(a)});for(var i=0;i<s.length;i++)if(s[i].id===id)return i+1;return null}
 function v7(it){var a=((window.SNAPSHOT||{}).vs||{})[it.id]||[];if(a.length<2)return 0;var l=a[a.length-1];return gainBetween(a,"v",l.t-6048e5,l.t)||0}
 function dsample(p,n){if(p.length<=n)return p;var st=Math.ceil(p.length/n),o=p.filter(function(_,i){return i%st===0}),l=p[p.length-1];if(o[o.length-1]!==l)o.push(l);return o}
