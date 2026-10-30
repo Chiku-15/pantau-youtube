@@ -109,6 +109,44 @@ body.snap #f,body.snap #exp,body.snap .del{display:none}
 .hch small{display:block;color:var(--muted);font-weight:500}
 body.home .wrap>:not(#home){display:none}
 body:not(.home) #home{display:none}
+.dvh{display:grid;grid-template-columns:minmax(0,1.5fr) auto auto auto;gap:16px 28px;align-items:start;padding:6px 0 18px;border-bottom:1px solid var(--line)}
+.dvt{display:flex;gap:14px;min-width:0}
+.dvt img{width:140px;height:79px;object-fit:cover;border-radius:6px;background:var(--line);flex:none}
+.dvt h2{font-size:clamp(1.1rem,3vw,1.6rem);margin:0 0 6px;letter-spacing:-.02em;line-height:1.15}
+.badge{display:inline-block;background:var(--views);color:#fff;font-size:.7rem;font-weight:700;padding:1px 7px;border-radius:3px;margin-right:6px}
+.dvs b.big{display:block;font-size:clamp(1.5rem,4vw,2.4rem);font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1.1}
+.dvs .gn{display:block;font-size:.85rem;font-weight:700;margin-top:4px}
+.dvs small{display:block;color:var(--muted)}
+.dvr{text-align:right}
+.dvm{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:26px;margin-top:18px}
+.dvm svg{width:100%;height:auto;display:block;touch-action:pan-y}
+@media(max-width:860px){.dvh{grid-template-columns:1fr 1fr}.dvt{grid-column:1/-1}.dvm{grid-template-columns:1fr}.dvr{text-align:left}}
+.rng{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:8px}
+.rng button{padding:8px 4px;font-size:.85rem}
+.rng button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.dnav{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;gap:8px;text-align:center;margin-bottom:6px}
+.dnav button{padding:8px 0}
+.dnav button:disabled{opacity:.35;cursor:default}
+.dnav small{display:block;color:var(--muted)}
+.lt{background:var(--likes);color:#fff;font-size:.65rem;font-weight:800;padding:1px 6px;border-radius:3px;letter-spacing:.06em;margin-left:6px}
+.dl{display:flex;align-items:center;gap:8px;font-weight:800;letter-spacing:.18em;font-size:.95rem;margin:14px 0 2px}
+.dl i{width:18px;height:5px;border-radius:3px;display:inline-block}
+.dvb{margin-top:22px;padding-top:14px;border-top:1px solid var(--line)}
+.dvb h3{font-size:.72rem;letter-spacing:.15em;color:var(--muted);margin:0 0 4px}
+.dvro{min-height:1.4em;font-size:.9rem;font-weight:600;margin:6px 0 0}
+.mile{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;position:sticky;top:12px;align-self:start}
+.mile h3{font-size:.72rem;letter-spacing:.15em;color:var(--muted);margin:0 0 10px}
+.mtop{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.mtop b{font-size:1.1rem}
+.mtop span{font-size:.8rem;color:var(--muted)}
+.pbar{height:6px;border-radius:3px;background:var(--line);overflow:hidden;margin:10px 0 6px}
+.pbar i{display:block;height:100%;background:var(--views)}
+.mrow{display:flex;justify-content:space-between;color:var(--muted);font-size:.85rem}
+.meta{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:.88rem;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.meta .k{color:var(--muted)}
+.cov{display:flex;gap:2px;margin-top:6px}
+.cov i{flex:1;height:8px;background:var(--line);border-radius:1px}
+.cov i.on{background:var(--views)}
 </style>
 </head>
 <body>
@@ -426,7 +464,7 @@ TABS.channel.viz=makeViz($("vz-channel"),{kind:"channel",metrics:TABS.channel.me
 function renderCards(){
   var T=TABS[tab],box=$("list");box.innerHTML="";
   var shown=T.items;
-  $("vz-video").hidden=!(tab==="video"&&detail);
+  $("vz-video").hidden=true;
   if(tab==="channel"){
     var bar2=el("div","");
     var back2=el("button","","← Kembali ke daftar video");back2.type="button";
@@ -434,12 +472,11 @@ function renderCards(){
     bar2.appendChild(back2);box.appendChild(bar2);
   }
   if(tab==="video"&&detail){
-    shown=T.items.filter(function(x){return x.id===detail});
-    var bar1=el("div","");bar1.style.cssText="display:flex;align-items:center;gap:12px;flex-wrap:wrap";
-    var back1=el("button","","← Kembali ke daftar video");back1.type="button";
-    back1.onclick=function(){detail=null;renderCards();window.scrollTo(0,0)};
-    bar1.appendChild(back1);box.appendChild(bar1);
-  }else if(tab==="video"){
+    var dv=T.items.filter(function(x){return x.id===detail})[0];
+    if(dv){renderDetail(box,dv);return}
+    detail=null;
+  }
+  if(tab==="video"){
     if(chFilter)shown=T.items.filter(function(x){return x.channel===chFilter});
     var bar3=el("div","");bar3.style.cssText="display:flex;align-items:center;gap:8px;flex-wrap:wrap";
     var back3=el("button","","← Beranda");back3.type="button";
@@ -584,11 +621,196 @@ function renderRank(box,list){
   var note=el("p","hnote","Batang = kenaikan 7 hari terakhir. Tanda * berarti pencatatan belum genap 24 jam. Target adalah perkiraan dari laju kenaikan terbaru.");
   box.appendChild(note);
 }
+/* ---------- Halaman detail video (gaya BM Tracker) ---------- */
+var dt={range:"month",off:0};
+var RLEN={day:864e5,week:6048e5,month:2592e6,year:31536e6};
+var RNAME=[["day","Hari"],["week","Minggu"],["month","Bulan"],["year","Tahun"],["all","Semua"]];
+var SHORTC={mv:"MV",dp:"DP",dpr:"PRAC"};
+var MSV=[1e6,5e6,10e6,20e6,50e6,100e6,150e6,200e6,300e6,400e6,500e6,750e6,1e9,1.5e9,2e9,3e9,5e9];
+function escH(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function ab(n){var a=Math.abs(n),u="",d=n;if(a>=1e9){d=n/1e9;u="B"}else if(a>=1e6){d=n/1e6;u="M"}else if(a>=1e3){d=n/1e3;u="K"}return (Math.round(d*10)/10)+u}
+function dvDate(ms,y){return new Date(ms).toLocaleDateString("id-ID",y?{day:"numeric",month:"short",year:"numeric"}:{day:"numeric",month:"short"})}
+function pubOf(v){var p=v.publishedAt||v.published||v.publishDate||v.date||v.releasedAt;if(!p)return null;var t=typeof p==="number"?p:Date.parse(p);return isNaN(t)?null:t}
+function atT(arr,t){var lo=0,hi=arr.length;while(lo<hi){var m=(lo+hi)>>1;if(arr[m].t<=t)lo=m+1;else hi=m}return lo?arr[lo-1]:null}
+function gainBetween(arr,k,t0,t1){var a=atT(arr,t0)||arr[0],b=atT(arr,t1);if(!a||!b||a[k]==null||b[k]==null)return null;return b[k]-a[k]}
+function ageStr(ms){var d=Math.max(0,Math.floor((Date.now()-ms)/864e5));if(d<30)return d+" hari";var m=Math.floor(d/30.44);return m+" bln "+Math.round(d-m*30.44)+" hr"}
+function rankOf(list,fn,id){var s=list.slice().sort(function(a,b){return fn(b)-fn(a)});for(var i=0;i<s.length;i++)if(s[i].id===id)return i+1;return null}
+function v7(it){var a=((window.SNAPSHOT||{}).vs||{})[it.id]||[];if(a.length<2)return 0;var l=a[a.length-1];return gainBetween(a,"v",l.t-6048e5,l.t)||0}
+function dsample(p,n){if(p.length<=n)return p;var st=Math.ceil(p.length/n),o=p.filter(function(_,i){return i%st===0}),l=p[p.length-1];if(o[o.length-1]!==l)o.push(l);return o}
+function floorB(ms,by){var d=new Date(ms);if(by==="hour")d.setMinutes(0,0,0);else{d.setHours(0,0,0,0);if(by==="month")d.setDate(1)}return d.getTime()}
+function nextB(ms,by){var d=new Date(ms);if(by==="hour")d.setHours(d.getHours()+1);else if(by==="day")d.setDate(d.getDate()+1);else d.setMonth(d.getMonth()+1);return d.getTime()}
+function blabel(t,by){if(by==="hour")return hhmm(t);if(by==="day")return dvDate(t);return new Date(t).toLocaleDateString("id-ID",{month:"short",year:"numeric"})}
+function buckets(arr,t0,t1,by){
+  var out=[],s=floorB(t0,by),now=Date.now(),first=arr[0].t,n=0;
+  while(s<t1&&n++<500){
+    var e=nextB(s,by);
+    if(e>first){
+      var a=atT(arr,s),b=atT(arr,Math.min(e,now)),part=!a;
+      a=a||arr[0];
+      out.push({t:s,g:(a.v!=null&&b&&b.v!=null)?b.v-a.v:0,partial:part,live:e>now});
+    }
+    s=e;
+  }
+  return out;
+}
+function drawSeries(svg,pts,k,color,t0,t1,fromZero,area,xlab){
+  var W=800,H=xlab?210:190,L=58,R=12,T=10,B=xlab?28:8;
+  var vals=pts.map(function(p){return p[k]}).filter(function(x){return x!=null});
+  if(!vals.length){svg.innerHTML="";return null}
+  var mn=fromZero?0:Math.min.apply(null,vals),mx=Math.max.apply(null,vals);
+  if(fromZero)mx*=1.08;else{var pd=(mx-mn)*.15||Math.max(1,mx*.01);mn=Math.max(0,mn-pd);mx+=pd}
+  if(mx<=mn)mx=mn+1;
+  var span=t1-t0||1;
+  function X(t){return L+(t-t0)/span*(W-L-R)}
+  function Y(v){return T+(H-T-B)*(1-(v-mn)/(mx-mn))}
+  var h="";
+  niceTicks(mn,mx,3).forEach(function(v){h+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(v)+'" y2="'+Y(v)+'" stroke="var(--line)"/><text x="'+(L-8)+'" y="'+(Y(v)+4)+'" text-anchor="end">'+ab(v)+'</text>'});
+  var pp=pts.filter(function(p){return p[k]!=null});
+  var line=pp.map(function(p){return X(p.t).toFixed(1)+","+Y(p[k]).toFixed(1)}).join(" ");
+  if(area&&pp.length)h+='<polygon points="'+X(pp[0].t).toFixed(1)+","+Y(mn)+" "+line+" "+X(pp[pp.length-1].t).toFixed(1)+","+Y(mn)+'" fill="'+color+'" opacity=".15"/>';
+  h+='<polyline fill="none" stroke="'+color+'" stroke-width="2.5" stroke-linejoin="round" points="'+line+'"/>';
+  if(xlab)for(var i=0;i<=3;i++){var t=t0+span*i/3;h+='<text x="'+X(t)+'" y="'+(H-8)+'" text-anchor="'+(i===0?"start":i===3?"end":"middle")+'">'+(span<=26*36e5?hhmm(t):dvDate(t,span>200*864e5))+'</text>'}
+  h+='<line class="hl" y1="'+T+'" y2="'+(H-B)+'" stroke="var(--muted)" stroke-dasharray="4 3" visibility="hidden"/><circle class="hc" r="4.5" fill="'+color+'" stroke="var(--surface)" stroke-width="2" visibility="hidden"/>';
+  svg.innerHTML=h;
+  return {X:X,Y:Y};
+}
+function drawBars(svg,bk,by){
+  var n=bk.length;if(!n){svg.innerHTML="";return}
+  var W=800,H=200,L=58,R=12,T=10,B=26,slot=(W-L-R)/n,vals=bk.map(function(b){return b.g});
+  var mn=Math.min(0,Math.min.apply(null,vals)),mx=Math.max(0,Math.max.apply(null,vals));
+  if(mx===mn)mx=1;mx*=1.08;if(mn<0)mn*=1.08;
+  function Y(v){return T+(H-T-B)*(1-(v-mn)/(mx-mn))}
+  var h="";
+  niceTicks(mn,mx,3).forEach(function(v){h+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(v)+'" y2="'+Y(v)+'" stroke="var(--line)"/><text x="'+(L-8)+'" y="'+(Y(v)+4)+'" text-anchor="end">'+ab(v)+'</text>'});
+  var every=Math.ceil(n/7);
+  bk.forEach(function(b,i){
+    var bx=L+i*slot+slot*.12,bw=slot*.76,y0=Y(0),y1=Y(b.g);
+    h+='<rect x="'+bx+'" y="'+Math.min(y0,y1)+'" width="'+bw+'" height="'+Math.max(Math.abs(y1-y0),1)+'" rx="2" fill="var(--views)" opacity="'+((b.partial||b.live)?".45":"1")+'"/>';
+    if(i%every===0)h+='<text x="'+(bx+bw/2)+'" y="'+(H-8)+'" text-anchor="middle">'+blabel(b.t,by)+'</text>';
+  });
+  svg.innerHTML=h;
+}
+function renderDetail(box,v){
+  var arr=((window.SNAPSHOT||{}).vs||{})[v.id]||[],T=TABS.video;
+  var back=el("button","","← Katalog");back.type="button";
+  back.onclick=function(){detail=null;renderCards();window.scrollTo(0,0)};
+  box.appendChild(back);
+  var root=el("div","");root.style.marginTop="14px";box.appendChild(root);
+  if(!arr.length){root.appendChild(el("p","empty","Menunggu data pertama dari server."));return}
+  var first=arr[0],last=arr[arr.length-1];
+  var d0=new Date();d0.setHours(0,0,0,0);
+  var y1=d0.getTime(),y0=y1-864e5,gv,gl,gtxt;
+  if(first.t<=y0){gv=gainBetween(arr,"v",y0,y1);gl=gainBetween(arr,"l",y0,y1);gtxt="pada "+dvDate(y0)}
+  else{gv=gainBetween(arr,"v",last.t-864e5,last.t);gl=gainBetween(arr,"l",last.t-864e5,last.t);gtxt="dalam 24 jam"}
+  var items=T.items.filter(function(x){return x.latest&&x.latest.v!=null});
+  var rkV=rankOf(items,function(x){return x.latest.v},v.id),rk7=rankOf(items,v7,v.id);
+  var cat=catOf(v),pub=pubOf(v);
+  var lpk=last.v&&last.l!=null?(last.l/last.v*1000).toFixed(1):null;
+  root.innerHTML=
+   '<div class="dvh"><div class="dvt">'+(v.thumb?'<img alt="" src="'+escH(v.thumb)+'">':'')+
+   '<div style="min-width:0"><h2>'+escH(v.title||v.id)+'</h2><div class="sub" style="margin:0">'+(cat?'<span class="badge">'+SHORTC[cat]+'</span>':'')+escH(v.channel||"")+' · '+ageStr(pub||first.t)+'</div>'+
+   (lpk?'<div class="sub" style="margin:8px 0 0"><b style="color:var(--ink)">'+lpk+'</b> like per 1.000 views</div>':'')+
+   '<div style="margin-top:6px"><a href="https://youtu.be/'+escH(v.id)+'" target="_blank" rel="noopener" style="color:var(--muted);font-size:.85rem">Buka di YouTube</a></div></div></div>'+
+   '<div class="dvs"><b class="big">'+fmt(last.v)+'</b><span class="gn" style="color:var(--views)">'+sg(gv)+' '+gtxt+'</span><small>views</small></div>'+
+   '<div class="dvs"><b class="big" style="color:var(--likes)">'+fmt(last.l)+'</b><span class="gn" style="color:var(--likes)">'+sg(gl)+' '+gtxt+'</span><small>like</small></div>'+
+   '<div class="dvs dvr">'+(rkV?'<b class="big">#'+rkV+'</b><small>dari '+items.length+' video</small><small><b style="color:var(--views)">#'+rk7+'</b> dalam 7 hari</small>':'')+'</div></div>'+
+   '<div class="dvm"><div class="dvmain"></div><aside class="dvside"></aside></div>';
+  var main=root.querySelector(".dvmain"),side=root.querySelector(".dvside");
+
+  function paintMain(){
+    var now=Date.now(),t0w,t1w;
+    if(dt.range==="all"){t0w=first.t;t1w=last.t}else{var Ln=RLEN[dt.range];t1w=now-dt.off*Ln;t0w=t1w-Ln}
+    var t0=Math.max(t0w,first.t),t1=Math.min(t1w,last.t);
+    var pts=dsample(arr.filter(function(s){return s.t>=t0&&s.t<=t1}),300);
+    var canPrev=dt.range!=="all"&&t0w>first.t,canNext=dt.range!=="all"&&dt.off>0;
+    var note="";
+    if(dt.range!=="all"&&dt.off===0&&t0w<first.t){var dd=(last.t-first.t)/864e5;note="Baru "+(dd<1?Math.max(1,Math.round(dd*24))+" jam":Math.ceil(dd)+" hari")+" tercatat"}
+    var label=dvDate(t0)+" – "+dvDate(t1,true);
+    var by=dt.range==="day"?"hour":dt.range==="year"?"month":dt.range==="all"?((last.t-first.t)>45*864e5?"month":"day"):"day";
+    var bk=buckets(arr,t0,Math.max(t1w,t1),by);
+    var big=null;bk.forEach(function(b){if(!b.partial&&!b.live&&(big===null||b.g>big.g))big=b});
+    var svgS='style="width:100%;height:auto;display:block;touch-action:pan-y"';
+    main.innerHTML=
+     '<div class="rng">'+RNAME.map(function(r){return '<button type="button" data-r="'+r[0]+'" aria-pressed="'+(dt.range===r[0])+'">'+r[1]+'</button>'}).join("")+'</div>'+
+     '<div class="dnav"><button type="button" data-n="1" aria-label="Periode sebelumnya"'+(canPrev?"":" disabled")+'>‹</button><div><b>'+label+'</b><small>'+note+(dt.off===0&&dt.range!=="all"?'<span class="lt">TERBARU</span>':'')+'</small></div><button type="button" data-n="-1" aria-label="Periode berikutnya"'+(canNext?"":" disabled")+'>›</button></div>'+
+     '<p class="dvro" data-ro>Arahkan kursor ke grafik untuk melihat angka.</p>'+
+     (pts.length>1?'<div class="dl"><i style="background:var(--views)"></i>VIEWS</div><svg class="cv" viewBox="0 0 800 190" '+svgS+'></svg><div class="dl"><i style="background:var(--likes)"></i>LIKE</div><svg class="cl" viewBox="0 0 800 210" '+svgS+'></svg>':'<div class="empty">Data pada rentang ini masih sedikit.</div>')+
+     '<div class="dvb"><h3>VIEWS BERTAMBAH PER '+(by==="hour"?"JAM":by==="day"?"HARI":"BULAN")+'</h3><svg class="cb" viewBox="0 0 800 200" '+svgS+'></svg>'+
+     '<p class="dvro" data-rb>Arahkan kursor ke batang untuk melihat rinciannya.</p>'+
+     (big?'<p class="sub" style="margin:4px 0 0">Terbesar sejauh ini: <b style="color:var(--ink)">'+sg(big.g)+'</b> ('+blabel(big.t,by)+')</p>':'')+
+     '<p class="legend">Batang pudar berarti periodenya belum penuh atau pencatatan baru mulai di periode itu.</p></div>';
+    main.querySelectorAll("button[data-r]").forEach(function(b){b.onclick=function(){dt.range=b.dataset.r;dt.off=0;paintMain()}});
+    main.querySelectorAll("button[data-n]").forEach(function(b){b.onclick=function(){dt.off=Math.max(0,dt.off+Number(b.dataset.n));paintMain()}});
+    var ro=main.querySelector("[data-ro]"),rb=main.querySelector("[data-rb]");
+    var sV=main.querySelector(".cv"),sL=main.querySelector(".cl");
+    if(sV){
+      var gV=drawSeries(sV,pts,"v","var(--views)",t0,t1,true,true,false),gL=drawSeries(sL,pts,"l","var(--likes)",t0,t1,false,false,true);
+      var hov=function(e){
+        var rc=e.currentTarget.getBoundingClientRect(),vx=(e.clientX-rc.left)/rc.width*800,best=pts[0],bd=1e18;
+        pts.forEach(function(p){var d=Math.abs(gV.X(p.t)-vx);if(d<bd){bd=d;best=p}});
+        [[sV,gV,"v"],[sL,gL,"l"]].forEach(function(a){
+          var g=a[1];if(!g)return;
+          var hl=a[0].querySelector(".hl"),hc=a[0].querySelector(".hc"),x=g.X(best.t);
+          hl.setAttribute("x1",x);hl.setAttribute("x2",x);hl.setAttribute("visibility","visible");
+          if(best[a[2]]!=null){hc.setAttribute("cx",x);hc.setAttribute("cy",g.Y(best[a[2]]));hc.setAttribute("visibility","visible")}
+        });
+        ro.textContent=new Date(best.t).toLocaleString("id-ID")+" · "+fmt(best.v)+" views · "+fmt(best.l)+" like";
+      };
+      if(gV){[sV,sL].forEach(function(s){s.onpointermove=hov;s.onpointerdown=hov})}
+    }
+    var sB=main.querySelector(".cb");drawBars(sB,bk,by);
+    var hb=function(e){
+      var n=bk.length;if(!n)return;
+      var rc=sB.getBoundingClientRect(),vx=(e.clientX-rc.left)/rc.width*800;
+      var i=Math.max(0,Math.min(n-1,Math.floor((vx-58)/((800-58-12)/n)))),b=bk[i];
+      rb.textContent=blabel(b.t,by)+": "+sg(b.g)+" views"+(b.partial?" (pencatatan baru mulai)":b.live?" (periode masih berjalan)":"");
+    };
+    sB.onpointermove=hb;sB.onpointerdown=hb;
+  }
+  paintMain();
+
+  /* panel kanan: milestone + info */
+  var cur=last.v||0,ni=0;while(ni<MSV.length&&MSV[ni]<=cur)ni++;
+  var nxt=MSV[ni],prv=ni>0?MSV[ni-1]:0;
+  var baseT=Math.max(first.t,last.t-864e5),span=(last.t-baseT)/864e5,g24=gainBetween(arr,"v",baseT,last.t)||0;
+  var rate=span>=1/24?g24/span:0,left=nxt?nxt-cur:0,days=rate>0&&nxt?Math.ceil(left/rate):null;
+  function reach(m){
+    var i=0;while(i<arr.length&&(arr[i].v==null||arr[i].v<m))i++;
+    if(i>=arr.length)return null;
+    if(i>0)return {t:arr[i].t,est:false};
+    if(pub&&first.v>0)return {t:pub+(first.t-pub)*(m/first.v),est:true};
+    return {t:null,est:true};
+  }
+  var st0=Math.max(0,ni-3),nodes=MSV.slice(st0,st0+6),sv="";
+  nodes.forEach(function(m,i){
+    var x=35+i*70,rd=m<=cur,isN=m===nxt,r=rd?reach(m):null;
+    if(i>0)sv+='<line x1="'+(x-70)+'" x2="'+x+'" y1="14" y2="14" stroke="'+(rd?'var(--views)':'var(--line)')+'" stroke-width="2"/>';
+    sv+='<circle cx="'+x+'" cy="14" r="5" fill="'+(rd?'var(--views)':isN?'var(--surface)':'var(--line)')+'"'+(isN?' stroke="var(--views)" stroke-width="2"':'')+'/>';
+    sv+='<text x="'+x+'" y="36" text-anchor="middle" style="fill:var(--ink);font-weight:700">'+ab(m)+'</text>';
+    var dtxt=rd?(r&&r.t?(r.est?"~":"")+dvDate(r.t):"sebelum dicatat"):isN?"berikutnya":"";
+    if(dtxt)sv+='<text x="'+x+'" y="52" text-anchor="middle" style="font-size:10px">'+dtxt+'</text>';
+  });
+  var have={};arr.forEach(function(s){var d=new Date(s.t);d.setHours(0,0,0,0);have[d.getTime()]=1});
+  var cd=new Date();cd.setHours(0,0,0,0);
+  var fd=new Date(first.t);fd.setHours(0,0,0,0);
+  var tracked=Math.round((cd.getTime()-fd.getTime())/864e5)+1,nd=Math.min(30,tracked),cv="";
+  for(var i=nd-1;i>=0;i--){var dd2=new Date(cd);dd2.setDate(dd2.getDate()-i);cv+='<i'+(have[dd2.getTime()]?' class="on"':'')+'></i>'}
+  var S=window.SNAPSHOT||{};
+  side.innerHTML='<div class="mile"><h3>MILESTONE</h3>'+
+   (nxt?'<div class="mtop"><b>'+ab(nxt)+' views</b><span>'+(days!==null?'PERKIRAAN <b style="color:var(--ink);font-size:.95rem">'+dvDate(Date.now()+days*864e5,true)+'</b>':'')+'</span></div>'+
+   '<div class="pbar"><i style="width:'+Math.max(0,Math.min(100,(cur-prv)/(nxt-prv)*100)).toFixed(1)+'%"></i></div>'+
+   '<div class="mrow"><span>'+fmt(left)+' lagi</span><span>'+(days!==null?(days>365?"> 1 tahun":days+" hari"):"–")+'</span></div>':'<p class="sub">Belum ada target berikutnya.</p>')+
+   '<svg viewBox="0 0 420 60" style="margin-top:14px" role="img" aria-label="Jalur milestone">'+sv+'</svg>'+
+   '<div class="meta"><span class="k">Rilis</span><span>'+(pub?dvDate(pub,true):'–')+'</span>'+
+   '<span class="k">Dicatat sejak</span><span>'+dvDate(first.t,true)+' · '+tracked+' hari</span>'+
+   '<span class="k">Sampling</span><span>tiap '+Math.max(1,Math.round((S.intervalSeconds||300)/60))+' menit</span>'+
+   '<span class="k">Cakupan</span><span>'+tracked+' hari<div class="cov">'+cv+'</div></span></div></div>';
+}
 function openVideo(id){
-  detail=id;TABS.video.sel=id;renderCards();showViz();window.scrollTo(0,0);
+  detail=id;dt.off=0;TABS.video.sel=id;renderCards();showViz();window.scrollTo(0,0);
 }
 function showViz(){
-  if(tab==="video"&&!detail)return Promise.resolve();
+  if(tab==="video")return Promise.resolve();
   var T=TABS[tab],v=T.items.filter(function(x){return x.id===T.sel})[0];
   return T.viz.show(T.sel,v?v.title:"Grafik");
 }
