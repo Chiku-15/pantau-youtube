@@ -491,9 +491,42 @@ function parseId(s){
 function niceTicks(mn,mx,n){
   var rg=mx-mn||1,step=Math.pow(10,Math.floor(Math.log10(rg/n))),e=rg/n/step;
   step*=(e<=1?1:e<=2?2:e<=5?5:10);
-  var out=[],s=Math.ceil(mn/step)*step;
-  for(var v=s;v<=mx+1e-9;v+=step)out.push(v);
+  step=Math.max(1,step); /* semua metrik adalah hitungan bulat — langkah pecahan tidak berguna */
+  var out=[],s=Math.ceil(mn/step)*step,i,v;
+  for(v=s;v<=mx+1e-9;v+=step)out.push(v);
+  /* Saat skala diperbesar sangat rapat (jendela sempit), bisa jadi hanya ada
+     satu tick — perkecil langkahnya agar minimal ada 2 garis bantu. */
+  var guard=0;
+  while(out.length<2&&step>1&&guard++<8){
+    step=Math.max(1,Math.round(step/2));
+    out=[];s=Math.ceil(mn/step)*step;
+    for(v=s;v<=mx+1e-9;v+=step)out.push(v);
+  }
   return out;
+}
+/* Label sumbu Y sadar-skala: makin rapat grid, makin banyak digit ditampilkan
+   (29,55 jt → 29,5124 jt → 29.512.400), jadi perubahan kecil pada subscriber /
+   total view yang besar langsung terlihat berbeda tanpa harus menunggu lama. */
+function ylab(v,step){
+  var a=Math.abs(v);
+  if(a<1e5)return fmt(Math.round(v));
+  step=Math.max(step||1,1);
+  var U=[[1e9," M"],[1e6," jt"],[1e3," rb"]];
+  for(var i=0;i<U.length;i++){
+    if(a>=U[i][0]){
+      var d=Math.max(0,Math.ceil(Math.log10(U[i][0])-Math.log10(step)-1e-9));
+      if(d<=3)return (v/U[i][0]).toLocaleString("id-ID",{minimumFractionDigits:d,maximumFractionDigits:d})+U[i][1];
+      break;
+    }
+  }
+  return fmt(Math.round(v));
+}
+function yticks(ticks){
+  var step=ticks.length>1?Math.abs(ticks[1]-ticks[0]):Math.abs(ticks[0]||1);
+  var labs=ticks.map(function(v){return ylab(v,step)}),seen={},dup=false;
+  labs.forEach(function(s){if(seen[s])dup=true;seen[s]=1});
+  if(dup)labs=ticks.map(function(v){return fmt(Math.round(v))});
+  return labs;
 }
 function plabel(t,b,short){
   var d=new Date(t);
@@ -518,8 +551,8 @@ var VSCAP={hour:"48 jam terakhir",day:"60 hari terakhir",week:"52 pekan terakhir
 function makeViz(root,cfg){
   var st={id:null,m:cfg.metrics[0][0],r:"24h",b:"hour",hist:[],sum:[]};
   var NAME={},COL={};cfg.metrics.forEach(function(x){NAME[x[0]]=x[1];COL[x[0]]=x[2]});
-  // Label sumbu Y ringkas: 10,59 M / 13,5 jt / 105 rb — biar tidak terpotong margin.
-  function yfmt(v){return Math.abs(v)>=1e5?short(v):fmt(Math.round(v))}
+  // Label sumbu Y memakai ylab()/yticks() global — jumlah digit menyesuaikan
+  // rapatnya grid, jadi angka besar dengan perubahan kecil tetap terbaca beda.
   function segM(){return cfg.metrics.map(function(x,i){return '<button type="button" data-m="'+x[0]+'" aria-pressed="'+(i===0)+'">'+x[1]+'</button>'}).join("")}
   root.innerHTML=
    '<section class="panel" data-r="panel" hidden><h2 data-r="ptitle">Grafik</h2>'+
@@ -561,28 +594,38 @@ function makeViz(root,cfg){
     var W=800,H=320,L=76,R=16,T=14,B=34;
     var t0=pts[0].t,t1=pts[pts.length-1].t,span=t1-t0||1;
     var mn=Math.min.apply(null,pts.map(function(p){return p.y})),mx=Math.max.apply(null,pts.map(function(p){return p.y}));
-    var pad=(mx-mn)*.12||1;mn=Math.max(0,mn-pad);mx=mx+pad;
+    var flat=mx===mn;
+    // Jika semua catatan bernilai sama (mis. subscriber masih persis 13.500.000),
+    // buka skala secukupnya saja (±0,006% atau ±2) supaya angka persisnya tetap
+    // terbaca di sumbu dan perubahan sekecil apa pun nanti langsung kelihatan.
+    var pad=(mx-mn)*.12||Math.max(Math.abs(mx)*6e-5,2);mn=Math.max(0,mn-pad);mx=mx+pad;
+    var ticks=niceTicks(mn,mx,4),labs=yticks(ticks);
+    L=Math.min(122,Math.max(56,Math.max.apply(null,labs.map(function(s){return s.length}))*6.6+14));
     function X(t){return L+(t-t0)/span*(W-L-R)}
     function Y(v){return T+(H-T-B)*(1-(v-mn)/(mx-mn))}
     var h="";
-    niceTicks(mn,mx,4).forEach(function(v){
-      h+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(v)+'" y2="'+Y(v)+'" stroke="var(--line)"/><text x="'+(L-8)+'" y="'+(Y(v)+4)+'" text-anchor="end">'+yfmt(v)+'</text>';
+    ticks.forEach(function(v,i){
+      h+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(v)+'" y2="'+Y(v)+'" stroke="var(--line)"/><text x="'+(L-8)+'" y="'+(Y(v)+4)+'" text-anchor="end">'+labs[i]+'</text>';
     });
     for(var i=0;i<=4;i++){
       var t=t0+span*i/4;
       h+='<text x="'+X(t)+'" y="'+(H-10)+'" text-anchor="'+(i===0?"start":i===4?"end":"middle")+'">'+stamp(t,span)+'</text>';
     }
     h+='<polyline fill="none" stroke="'+COL[mk]+'" stroke-width="2.5" stroke-linejoin="round" points="'+pts.map(function(p){return X(p.t).toFixed(1)+","+Y(p.y).toFixed(1)}).join(" ")+'"/>';
+    if(pts.length<=90)pts.forEach(function(p){h+='<circle cx="'+X(p.t).toFixed(1)+'" cy="'+Y(p.y).toFixed(1)+'" r="2.6" fill="'+COL[mk]+'" stroke="var(--surface)" stroke-width="1"/>'});
+    var lp=pts[pts.length-1],lx=X(lp.t),ly=Y(lp.y),lt=fmt(Math.round(lp.y)),bw=lt.length*6.6+16,bx=Math.min(Math.max(lx-bw/2,L),W-R-bw),by=ly-30;if(by<T+2)by=Math.min(ly+12,H-B-20);
+    h+='<g pointer-events="none"><rect x="'+bx.toFixed(1)+'" y="'+by.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="18" rx="9" fill="'+COL[mk]+'"/><text x="'+(bx+bw/2).toFixed(1)+'" y="'+(by+13).toFixed(1)+'" text-anchor="middle" style="fill:#fff;font-weight:700;font-size:11px">'+lt+'</text></g>';
     h+='<line data-r="hl" y1="'+T+'" y2="'+(H-B)+'" stroke="var(--muted)" stroke-dasharray="4 3" visibility="hidden"/><circle data-r="hc" r="5" fill="'+COL[mk]+'" stroke="var(--surface)" stroke-width="2" visibility="hidden"/>';
     svg.innerHTML=h;
-    q("gain").textContent="Bertambah "+fmt(pts[pts.length-1].y-pts[0].y)+" "+NAME[mk].toLowerCase()+" sejak "+stamp(t0,span)+".";
+    q("gain").textContent="Bertambah "+fmt(pts[pts.length-1].y-pts[0].y)+" "+NAME[mk].toLowerCase()+" sejak "+stamp(t0,span)+"."+(flat?" Semua catatan di rentang ini bernilai sama persis ("+fmt(pts[0].y)+") — skala grafik sudah dibuka selempit mungkin, begitu angkanya berubah sedikit saja garisnya langsung terlihat."+(mk==="s"?" Ingat: angka subscriber dari YouTube dibulatkan (13,5 jt dst.), jadi biasanya naiknya melompat sekali lalu diam lagi.":""):"");
     function move(e){
-      var rc=svg.getBoundingClientRect(),vx=(e.clientX-rc.left)/rc.width*W,best=pts[0],bd=1e9;
-      pts.forEach(function(p){var d=Math.abs(X(p.t)-vx);if(d<bd){bd=d;best=p}});
+      var rc=svg.getBoundingClientRect(),vx=(e.clientX-rc.left)/rc.width*W,best=pts[0],bi=0,bd=1e9;
+      pts.forEach(function(p,i){var d=Math.abs(X(p.t)-vx);if(d<bd){bd=d;best=p;bi=i}});
       var hl=q("hl"),hc=q("hc");
       hl.setAttribute("x1",X(best.t));hl.setAttribute("x2",X(best.t));hl.setAttribute("visibility","visible");
       hc.setAttribute("cx",X(best.t));hc.setAttribute("cy",Y(best.y));hc.setAttribute("visibility","visible");
-      q("readout").textContent=new Date(best.t).toLocaleString("id-ID")+": "+fmt(best.y)+" "+NAME[mk].toLowerCase();
+      var dp=bi>0?best.y-pts[bi-1].y:null;
+      q("readout").textContent=new Date(best.t).toLocaleString("id-ID")+" — "+fmt(best.y)+" "+NAME[mk].toLowerCase()+(dp===null?" · catatan pertama di grafik ini":dp===0?" · tetap, sama seperti catatan sebelumnya":" · "+sg(dp)+" dari catatan sebelumnya");
     }
     svg.onpointermove=move;svg.onpointerdown=move;
   }
@@ -596,14 +639,16 @@ function makeViz(root,cfg){
     var total=0,top=null;
     items.forEach(function(x){if(!x.empty&&x[mk]!==null&&x[mk]!==undefined){total+=x[mk];if(top===null||x[mk]>top[mk])top=x}});
     q("sstat").textContent="Total "+(VSCAP[st.b]||"")+": "+sg(total)+" "+NAME[mk].toLowerCase()+". Tertinggi: "+plabel(top.t,st.b)+" ("+sg(top[mk])+").";
-    var W=800,H=260,L=76,R=12,T=12,B=30,slot=(W-L-R)/n;
+    var W=800,H=260,R=12,T=12,B=30;
     var mn=Math.min(0,Math.min.apply(null,vals)),mx=Math.max(0,Math.max.apply(null,vals));
     if(mx===mn)mx=1;
     var pad=(mx-mn)*.08;if(mx>0)mx+=pad;if(mn<0)mn-=pad;
+    var ticks=niceTicks(mn,mx,4),labs=yticks(ticks);
+    var L=Math.min(122,Math.max(56,Math.max.apply(null,labs.map(function(s){return s.length}))*6.6+14)),slot=(W-L-R)/n;
     function Y(v){return T+(H-T-B)*(1-(v-mn)/(mx-mn))}
     var h="";
-    niceTicks(mn,mx,4).forEach(function(v){
-      h+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(v)+'" y2="'+Y(v)+'" stroke="var(--line)"/><text x="'+(L-8)+'" y="'+(Y(v)+4)+'" text-anchor="end">'+yfmt(v)+'</text>';
+    ticks.forEach(function(v,i){
+      h+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(v)+'" y2="'+Y(v)+'" stroke="var(--line)"/><text x="'+(L-8)+'" y="'+(Y(v)+4)+'" text-anchor="end">'+labs[i]+'</text>';
     });
     h+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(0)+'" y2="'+Y(0)+'" stroke="var(--muted)"/>';
     var every=Math.ceil(n/8);
@@ -715,7 +760,7 @@ function makeViz(root,cfg){
     sync();
   });
   return {
-    show:function(id,title){var ch=id!==st.id;st.id=id;q("ptitle").textContent=title||"Grafik";if(ch){st.hist=[];st.sum=[]}return load()}
+    show:function(id,title){var ch=id!==st.id;st.id=id;q("ptitle").textContent=title||"Grafik";if(ch){st.hist=[];st.sum=[];q("readout").textContent="Arahkan kursor ke grafik untuk melihat angka.";q("sread").textContent="Arahkan kursor ke batang untuk melihat rinciannya."}return load()}
   };
 }
 
@@ -731,7 +776,7 @@ var TABS={
     list:"/api/channels",del:"/api/channels/",ph:"https://www.youtube.com/@namachannel",btn:"Tambah channel",
     empty:"Belum ada channel. Tambahkan satu (tautan channel, @handle, atau ID yang diawali UC).",
     metrics:[["s","Subscriber","var(--likes)"],["v","Total view","var(--views)"],["n","Video","var(--comments)"]],
-    legend:" Angka subscriber dibulatkan oleh YouTube (misalnya 1,23 juta), jadi pertambahan kecil bisa tidak terlihat. Total view & subscriber channel juga sering baru diperbarui YouTube sekali sehari-an, jadi bisa terlihat diam lama — jumlah video biasanya paling cepat berubah.",
+    legend:" Skala grafik otomatis diperbesar mengikuti perubahan terkecil, jadi perubahan sekecil apa pun langsung terlihat tanpa menunggu lama. Catatan: angka subscriber dari YouTube dibulatkan (mis. 13,5 jt) — subscriber baru terlihat begitu YouTube memperbarui angka bulatnya, sedangkan total view biasanya berubah di tiap pencatatan.",
     viz:null,items:[],sel:null
   }
 };
@@ -932,7 +977,7 @@ function buckets(arr,t0,t1,by){
   return out;
 }
 function drawSeries(svg,pts,k,color,t0,t1,fromZero,area,xlab,W){
-  var H=200,L=58,R=12,T=10,B=28;svg.setAttribute("viewBox","0 0 "+W+" "+H);
+  var H=200,R=12,T=10,B=28;svg.setAttribute("viewBox","0 0 "+W+" "+H);
   var vals=pts.map(function(p){return p[k]}).filter(function(x){return x!=null});
   if(!vals.length){svg.innerHTML="";return null}
   var vmin=Math.min.apply(null,vals),mx=Math.max.apply(null,vals);
@@ -941,27 +986,32 @@ function drawSeries(svg,pts,k,color,t0,t1,fromZero,area,xlab,W){
   if(fromZero)mx*=1.08;else{var pd=(mx-mn)*.15||Math.max(1,mx*.01);mn=Math.max(0,mn-pd);mx+=pd}
   if(mx<=mn)mx=mn+1;
   var span=t1-t0||1;
+  var ticks=niceTicks(mn,mx,3),labs=yticks(ticks);
+  var L=Math.min(96,Math.max(44,Math.max.apply(null,labs.map(function(s){return s.length}))*6.4+12));
   function X(t){return L+(t-t0)/span*(W-L-R)}
   function Y(v){return T+(H-T-B)*(1-(v-mn)/(mx-mn))}
   var h="";
-  niceTicks(mn,mx,3).forEach(function(v){h+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(v)+'" y2="'+Y(v)+'" stroke="var(--line)"/><text x="'+(L-8)+'" y="'+(Y(v)+4)+'" text-anchor="end">'+ab(v)+'</text>'});
+  ticks.forEach(function(v,i){h+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(v)+'" y2="'+Y(v)+'" stroke="var(--line)"/><text x="'+(L-8)+'" y="'+(Y(v)+4)+'" text-anchor="end">'+labs[i]+'</text>'});
   var pp=pts.filter(function(p){return p[k]!=null});
   var line=pp.map(function(p){return X(p.t).toFixed(1)+","+Y(p[k]).toFixed(1)}).join(" ");
   if(area&&pp.length)h+='<polygon points="'+X(pp[0].t).toFixed(1)+","+Y(mn)+" "+line+" "+X(pp[pp.length-1].t).toFixed(1)+","+Y(mn)+'" fill="'+color+'" opacity=".15"/>';
   h+='<polyline fill="none" stroke="'+color+'" stroke-width="2.5" stroke-linejoin="round" points="'+line+'"/>';
+  if(pp.length&&pp.length<=80)pp.forEach(function(p){h+='<circle cx="'+X(p.t).toFixed(1)+'" cy="'+Y(p[k]).toFixed(1)+'" r="2.2" fill="'+color+'" stroke="var(--surface)" stroke-width="1"/>'});
   if(xlab)for(var i=0;i<=3;i++){var t=t0+span*i/3;h+='<text x="'+X(t)+'" y="'+(H-8)+'" text-anchor="'+(i===0?"start":i===3?"end":"middle")+'">'+(span<=26*36e5?hhmm(t):dvDate(t,span>200*864e5))+'</text>'}
   h+='<line class="hl" y1="'+T+'" y2="'+(H-B)+'" stroke="var(--muted)" stroke-dasharray="4 3" visibility="hidden"/><circle class="hc" r="4.5" fill="'+color+'" stroke="var(--surface)" stroke-width="2" visibility="hidden"/>';
   svg.innerHTML=h;
   return {X:X,Y:Y};
 }
 function drawBars(svg,bk,by,W){
-  var n=bk.length;if(!n){svg.innerHTML="";return}
-  var H=200,L=58,R=12,T=10,B=26,slot=(W-L-R)/n,vals=bk.map(function(b){return b.g});svg.setAttribute("viewBox","0 0 "+W+" "+H);
+  var n=bk.length;if(!n){svg.innerHTML="";return 58}
+  var H=200,R=12,T=10,B=26,vals=bk.map(function(b){return b.g});svg.setAttribute("viewBox","0 0 "+W+" "+H);
   var mn=Math.min(0,Math.min.apply(null,vals)),mx=Math.max(0,Math.max.apply(null,vals));
   if(mx===mn)mx=1;mx*=1.08;if(mn<0)mn*=1.08;
+  var ticks=niceTicks(mn,mx,3),labs=yticks(ticks);
+  var L=Math.min(96,Math.max(44,Math.max.apply(null,labs.map(function(s){return s.length}))*6.4+12)),slot=(W-L-R)/n;
   function Y(v){return T+(H-T-B)*(1-(v-mn)/(mx-mn))}
   var h="";
-  niceTicks(mn,mx,3).forEach(function(v){h+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(v)+'" y2="'+Y(v)+'" stroke="var(--line)"/><text x="'+(L-8)+'" y="'+(Y(v)+4)+'" text-anchor="end">'+ab(v)+'</text>'});
+  ticks.forEach(function(v,i){h+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(v)+'" y2="'+Y(v)+'" stroke="var(--line)"/><text x="'+(L-8)+'" y="'+(Y(v)+4)+'" text-anchor="end">'+labs[i]+'</text>'});
   var every=Math.ceil(n/7);
   bk.forEach(function(b,i){
     var bx=L+i*slot+slot*.12,bw=slot*.76,y0=Y(0),y1=Y(b.g);
@@ -969,6 +1019,7 @@ function drawBars(svg,bk,by,W){
     if(i%every===0)h+='<text x="'+(bx+bw/2)+'" y="'+(H-8)+'" text-anchor="middle">'+blabel(b.t,by)+'</text>';
   });
   svg.innerHTML=h;
+  return L;
 }
 var __rz;window.addEventListener("resize",function(){clearTimeout(__rz);__rz=setTimeout(function(){if(window.__dvp&&detail&&tab==="video"&&document.querySelector(".dvmain"))window.__dvp()},150)});
 function renderDetail(box,v){
@@ -1040,11 +1091,11 @@ function renderDetail(box,v){
       };
       if(gV){[sV,sL].forEach(function(s){s.onpointermove=hov;s.onpointerdown=hov})}
     }
-    var sB=main.querySelector(".cb"),wB=Math.max(240,Math.floor(sB.getBoundingClientRect().width));drawBars(sB,bk,by,wB);
+    var sB=main.querySelector(".cb"),wB=Math.max(240,Math.floor(sB.getBoundingClientRect().width)),LB=drawBars(sB,bk,by,wB)||58;
     var hb=function(e){
       var n=bk.length;if(!n)return;
       var rc=sB.getBoundingClientRect(),vx=(e.clientX-rc.left)/rc.width*wB;
-      var i=Math.max(0,Math.min(n-1,Math.floor((vx-58)/((wB-58-12)/n)))),b=bk[i];
+      var i=Math.max(0,Math.min(n-1,Math.floor((vx-LB)/((wB-LB-12)/n)))),b=bk[i];
       rb.textContent=blabel(b.t,by)+": "+sg(b.g)+" views"+(b.partial?" (pencatatan baru mulai)":b.live?" (periode masih berjalan)":"");
     };
     sB.onpointermove=hb;sB.onpointerdown=hb;
@@ -1406,4 +1457,4 @@ if(!window.SNAPSHOT||window.SNAPSHOT.live)setInterval(load,15000);
 </body>
 </html>
 
-<!-- build: analisis-pertumbuhan v8 -->
+<!-- build: detail-grafik v9 -->
