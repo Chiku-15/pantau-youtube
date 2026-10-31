@@ -319,7 +319,7 @@ body:not(.home) #home{display:none}
   <div class="tn-links" id="tnlinks">
     <button type="button" data-nav="home" aria-current="true">Beranda</button>
     <button type="button" data-nav="rank">Peringkat</button>
-    <button type="button" data-nav="chan">Channel</button>
+    <button type="button" data-nav="channel">Channel</button>
   </div>
   <form class="tn-search" id="tnsearch" role="search"><input id="tnq" type="search" placeholder="Cari video…" aria-label="Cari video"></form>
   <button id="theme" class="theme-btn" type="button" aria-label="Ganti tema terang/gelap">◐</button>
@@ -635,7 +635,9 @@ var tab="video",confirmDel=null,chFilter=null,detail=null,pendingCh=null;
 TABS.video.viz=makeViz($("vz-video"),{kind:"video",metrics:TABS.video.metrics});
 TABS.channel.viz=makeViz($("vz-channel"),{kind:"channel",metrics:TABS.channel.metrics,legend:TABS.channel.legend});
 
+function syncNav(w){if(document.body.classList.contains("home"))w="home";document.querySelectorAll("#tnlinks button").forEach(function(b){b.setAttribute("aria-current",String(b.dataset.nav===w))})}
 function renderCards(){
+  syncNav(tab==="channel"?"channel":"rank");
   var T=TABS[tab],box=$("list");box.innerHTML="";
   var shown=T.items;
   $("vz-video").hidden=true;
@@ -643,11 +645,11 @@ function renderCards(){
   if(tab==="video"){if(detail){var tdv=T.items.filter(function(x){return x.id===detail})[0];thN=tdv&&tdv.channel}else thN=chFilter}
   else{var tcs=T.items.filter(function(x){return x.id===T.sel})[0];thN=tcs&&tcs.title}
   applyTheme(thN);
-  if(tab==="channel"){
-    var bar2=el("div","");
-    var back2=el("button","","← Kembali ke daftar video");back2.type="button";
-    back2.onclick=function(){chFilter=null;detail=null;setTab("video");window.scrollTo(0,0)};
-    bar2.appendChild(back2);box.appendChild(bar2);
+  if(tab==="video"&&chFilter){
+    var bar3=el("div","");bar3.style.cssText="display:flex;align-items:center;gap:8px;flex-wrap:wrap";
+    var fc=el("button","chip","🏷️ "+chFilter+" ✕");fc.type="button";fc.title="Hapus filter channel";
+    fc.onclick=function(){chFilter=null;detail=null;renderCards()};
+    bar3.appendChild(fc);box.appendChild(bar3);
   }
   if(tab==="video"&&detail){
     var dv=T.items.filter(function(x){return x.id===detail})[0];
@@ -656,11 +658,6 @@ function renderCards(){
   }
   if(tab==="video"){
     if(chFilter)shown=T.items.filter(function(x){return x.channel===chFilter});
-    var bar3=el("div","");bar3.style.cssText="display:flex;align-items:center;gap:8px;flex-wrap:wrap";
-    var back3=el("button","","← Beranda");back3.type="button";
-    back3.onclick=function(){chFilter=null;document.body.classList.add("home");renderHome();window.scrollTo(0,0)};
-    bar3.appendChild(back3);
-    box.appendChild(bar3);
   }
   if(tab==="video"&&!detail){renderRank(box,shown);return}
   shown.forEach(function(v){
@@ -1167,6 +1164,7 @@ function openChannelList(name,cat){rk.cat=cat||"all";chFilter=name;leaveHome();r
 var HMCATS=[["mv","🎬","MV","Video musik resmi"],["dp","💃","Dance Performance","Penampilan koreografi"],["dpr","🕺","Dance Practice","Latihan tari"]];
 function goList(cat){rk.cat=cat||"all";chFilter=null;leaveHome();renderCards()}
 function renderHome(){
+  syncNav("home");
   return Promise.all([api("/api/tracked"),api("/api/channels")]).then(function(r){
     if(hmCh.drag)return;
     var vs=r[0].items.filter(function(x){return x.latest&&!JUNK.test((x.title||"").toLowerCase())}),chs=r[1].items,box=$("home");
@@ -1236,7 +1234,7 @@ function renderHome(){
   }).catch(function(){});
 }
 function goChannel(name){
-  pendingCh=name;chFilter=null;detail=null;setTab("channel");window.scrollTo(0,0);
+  leaveHome();pendingCh=name;chFilter=null;detail=null;setTab("channel");window.scrollTo(0,0);
 }
 function openChannel(name){
   chFilter=name;detail=null;var T=TABS.video,mine=T.items.filter(function(x){return x.channel===name});
@@ -1269,10 +1267,12 @@ $("f").onsubmit=function(e){
 
 /* ---------- Navigasi atas ---------- */
 function navGo(w){
-  document.querySelectorAll("#tnlinks button").forEach(function(b){b.setAttribute("aria-current",String(b.dataset.nav===w))});
-  if(w==="home"){document.body.classList.add("home");renderHome();window.scrollTo(0,0)}
-  else if(w==="rank"){goList("all")}
-  else{chFilter=null;detail=null;setTab("channel");window.scrollTo(0,0)}
+  if(w==="home"){document.body.classList.add("home");syncNav(w);renderHome();window.scrollTo(0,0)}
+  else{
+    leaveHome();syncNav(w);
+    if(w==="rank"){if(tab!=="video")setTab("video");goList("all")}
+    else{chFilter=null;detail=null;setTab("channel");window.scrollTo(0,0)}
+  }
 }
 $("navb").onclick=function(){navGo("home")};
 document.querySelectorAll("#tnlinks button").forEach(function(b){b.onclick=function(){navGo(b.dataset.nav)}});
@@ -1295,10 +1295,11 @@ $("exp").href="/api/export?tz="+new Date().getTimezoneOffset();
 })();
 document.body.classList.add("home");renderHome();
 setTab("video");
+syncNav("home");
 setInterval(function(){if(document.body.classList.contains("home"))renderHome()},15000);
 if(!window.SNAPSHOT||window.SNAPSHOT.live)setInterval(load,15000);
 </script>
 </body>
 </html>
 
-<!-- build: indikator-grafik v6 -->
+<!-- build: nav-fix v7 -->
