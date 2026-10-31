@@ -1046,10 +1046,16 @@ function drawBars(svg,bk,by,W){
   function Y(v){return T+(H-T-B)*(1-(v-mn)/(mx-mn))}
   var h="";
   ticks.forEach(function(v,i){h+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(v)+'" y2="'+Y(v)+'" stroke="var(--line)"/><text x="'+(L-8)+'" y="'+(Y(v)+4)+'" text-anchor="end">'+labs[i]+'</text>'});
-  var every=Math.ceil(n/7);
+  var every=Math.ceil(n/7),curT=floorB(Date.now(),by);
   bk.forEach(function(b,i){
     var bx=L+i*slot+slot*.12,bw=slot*.76,y0=Y(0),y1=Y(b.g);
-    h+='<rect x="'+bx+'" y="'+Math.min(y0,y1)+'" width="'+bw+'" height="'+Math.max(Math.abs(y1-y0),1)+'" rx="2" fill="var(--views)" opacity="'+((b.partial||b.live)?".45":"1")+'"/>';
+    if(b.live&&b.t===curT){
+      var hh=Math.max(Math.abs(y1-y0),4);
+      h+='<rect x="'+bx+'" y="'+(y0-hh)+'" width="'+bw+'" height="'+hh+'" rx="2" fill="var(--views)" opacity=".12"/>'+
+         '<rect x="'+bx+'" y="'+(y0-hh)+'" width="'+bw+'" height="'+hh+'" rx="2" fill="none" stroke="var(--views)" stroke-width="1.5" stroke-dasharray="5 3" opacity=".9"/>';
+    }else if(!b.live&&(b.partial||Math.abs(y1-y0)>=1.5)){
+      h+='<rect x="'+bx+'" y="'+Math.min(y0,y1)+'" width="'+bw+'" height="'+Math.max(Math.abs(y1-y0),1)+'" rx="2" fill="var(--views)" opacity="'+(b.partial?".45":"1")+'"/>';
+    }
     if(i%every===0)h+='<text x="'+(bx+bw/2)+'" y="'+(H-8)+'" text-anchor="middle">'+blabel(b.t,by)+'</text>';
   });
   svg.innerHTML=h;
@@ -1092,6 +1098,12 @@ function renderDetail(box,v){
     var by=dt.range==="day"?"hour":dt.range==="year"?"month":dt.range==="all"?((last.t-first.t)>45*864e5?"month":"day"):"day";
     var bk=buckets(arr,t0,Math.max(t1w,t1),by);
     var big=null;bk.forEach(function(b){if(!b.partial&&!b.live&&(big===null||b.g>big.g))big=b});
+    /* "still climbing": periode berjalan berpeluang jadi rekor, atau rekor masih di periode terakhir yang penuh */
+    var liveB=(bk.length&&bk[bk.length-1].live)?bk[bk.length-1]:null,lastC=null;
+    bk.forEach(function(b){if(!b.partial&&!b.live)lastC=b});
+    var pace=0;
+    if(liveB){var elf=(now-liveB.t)/Math.max(1,nextB(liveB.t,by)-liveB.t);pace=elf>.02?liveB.g/elf:liveB.g}
+    var climb=!!big&&((liveB&&pace>big.g)||(lastC&&big&&lastC.t===big.t));
     var svgS='style="width:100%;height:auto;display:block;touch-action:pan-y"';
     main.innerHTML=
      '<div class="rng">'+RNAME.map(function(r){return '<button type="button" data-r="'+r[0]+'" aria-pressed="'+(dt.range===r[0])+'">'+r[1]+'</button>'}).join("")+'</div>'+
@@ -1100,8 +1112,8 @@ function renderDetail(box,v){
      (pts.length>1?'<div class="cgrid"><div><div class="dl"><i style="background:var(--views)"></i>VIEWS</div><svg class="cv" viewBox="0 0 400 200" '+svgS+'></svg></div><div><div class="dl"><i style="background:var(--likes)"></i>LIKE</div><svg class="cl" viewBox="0 0 400 200" '+svgS+'></svg></div></div>':'<div class="empty">Data pada rentang ini masih sedikit.</div>')+
      '<div class="dvb"><h3>VIEWS BERTAMBAH PER '+(by==="hour"?"JAM":by==="day"?"HARI":"BULAN")+'</h3><svg class="cb" viewBox="0 0 800 200" '+svgS+'></svg>'+
      '<p class="dvro" data-rb>Arahkan kursor ke batang untuk melihat rinciannya.</p>'+
-     (big?'<p class="sub" style="margin:4px 0 0">Terbesar sejauh ini: <b style="color:var(--ink)">'+sg(big.g)+'</b> ('+blabel(big.t,by)+')</p>':'')+
-     '<p class="legend">Batang pudar berarti periodenya belum penuh atau pencatatan baru mulai di periode itu.</p></div>';
+     (big?'<p class="sub" style="margin:4px 0 0;display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap"><span>Terbesar sejauh ini: <b style="color:var(--ink)">'+sg(big.g)+'</b> ('+blabel(big.t,by)+')</span>'+(climb?'<span style="color:var(--views);font-weight:700;white-space:nowrap">▲ masih menanjak — belum ada puncak</span>':'')+'</p>':'')+
+     '<p class="legend">Batang pudar berarti periodenya belum penuh atau pencatatan baru mulai di periode itu; batang garis putus-putus berarti periodenya masih berjalan.</p></div>';
     main.querySelectorAll("button[data-r]").forEach(function(b){b.onclick=function(){dt.range=b.dataset.r;dt.off=0;paintMain()}});
     main.querySelectorAll("button[data-n]").forEach(function(b){b.onclick=function(){dt.off=Math.max(0,dt.off+Number(b.dataset.n));paintMain()}});
     var ro=main.querySelector("[data-ro]"),rb=main.querySelector("[data-rb]");
@@ -1541,4 +1553,4 @@ if(!window.SNAPSHOT||window.SNAPSHOT.live)setInterval(load,15000);
 </body>
 </html>
 
-<!-- build: perubahan-angka v10 -->
+<!-- build: tracker-puncak v11 -->
