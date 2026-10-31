@@ -827,14 +827,14 @@ var TABS={
   }
 };
 var tab="video",confirmDel=null,chFilter=null,detail=null,pendingCh=null;
-var SRC="yt",spSel=null,spView="home",spQ="",spHr=String(6048e5);try{SRC=localStorage.getItem("sumber")==="sp"?"sp":"yt"}catch(e){}
+var SRC="yt",spSel=null,spView="home",spQ="",spHr=String(6048e5),spAF="all",spSort="total",spSelA=null,spArK="f",spArR=String(2592e6);try{SRC=localStorage.getItem("sumber")==="sp"?"sp":"yt"}catch(e){}
 var dtsp={range:"all",off:0};
 TABS.video.viz=makeViz($("vz-video"),{kind:"video",metrics:TABS.video.metrics});
 TABS.channel.viz=makeViz($("vz-channel"),{kind:"channel",metrics:TABS.channel.metrics,legend:TABS.channel.legend});
 
 function syncNav(w){if(!document.body.classList.contains("spmode")&&document.body.classList.contains("home"))w="home";document.querySelectorAll("#tnlinks button").forEach(function(b){b.setAttribute("aria-current",String(b.dataset.nav===w))})}
 function renderCards(){
-  syncNav(tab==="channel"?"channel":"rank");
+  if(!document.body.classList.contains("home"))syncNav(tab==="channel"?"channel":"rank");
   var T=TABS[tab],box=$("list");box.innerHTML="";
   var shown=T.items;
   $("vz-video").hidden=true;
@@ -1412,6 +1412,17 @@ function songKey(s){
 }
 function spArr(id){var S=window.SNAPSHOT||{},sp=S.sp||{};return ((sp.hist||{})[id]||[]).map(function(r){return {t:r.t,v:r.s!==undefined?r.s:r.f}})}
 function spLatest(id){var a=spArr(id);return a.length?a[a.length-1].v:null}
+function spArrK(id,k){var S=window.SNAPSHOT||{},sp=S.sp||{};return ((sp.hist||{})[id]||[]).filter(function(r){return r[k]!=null}).map(function(r){return {t:r.t,v:r[k]}})}
+/* lagu-lagu milik satu artis: artis utama lagu = nama artis yang dipantau */
+function spTracksOf(a){
+  if(!a)return[];
+  var nm=String(a.name||"").toLowerCase();
+  if(!nm)return[];
+  return trackList().filter(function(x){
+    var p=String(x.t.artist||"").toLowerCase().split(",");
+    return p.some(function(s){s=s.trim();return s===nm||s.indexOf(nm)>=0});
+  });
+}
 function trackList(){var S=window.SNAPSHOT||{},sp=S.sp||{};return (sp.tracks||[]).map(function(t){return {t:t,v:spLatest(t.id)}}).filter(function(x){return x.v!=null})}
 function ytToTrack(title, vid){
   var S=window.SNAPSHOT||{},sp=S.sp||{};
@@ -1459,7 +1470,7 @@ function spTotalSeries(){
   return Object.keys(m).map(Number).sort(function(a,b){return a-b}).map(function(t){return {t:t,v:m[t]}});
 }
 function renderSpHome(){
-  spView="home";
+  spView="home";syncNav("home");
   var S=window.SNAPSHOT||{},box=$("home");
   box.innerHTML="";applyTheme(null);document.body.classList.add("home","spmode");
   if(!S.sp||!S.sp.tracks||!S.sp.tracks.length){box.appendChild(spEmpty());return}
@@ -1506,25 +1517,141 @@ function renderSpHome(){
     var b=el("button","hm-kc");b.type="button";
     b.innerHTML=(a.thumb?'<img class="av" alt="" src="'+escH(a.thumb)+'">':'<span class="ic" aria-hidden="true">🎤</span>')+
      '<span class="tx"><b>'+escH(a.name||a.id)+'</b><small>'+[(f!=null?fmt(f)+" follower":null),(a.listeners!=null?fmt(a.listeners)+" pendengar/bln":null),(g?'<b style="color:var(--views)">'+sg(g)+"</b> / 24 jam":null)].filter(Boolean).join(" · ")+'</small></span><span class="ar" aria-hidden="true">→</span>';
-    b.onclick=function(){window.open("https://open.spotify.com/artist/"+escH(a.id),"_blank","noopener")};
+    b.onclick=function(){openSpArtist(a.id)};
     kz.appendChild(b);
   });
   rp.appendChild(kz);cols.appendChild(rp);box.appendChild(cols);
 }
 function renderSpList(){
-  spView="list";
+  spView="list";syncNav("rank");
   var S=window.SNAPSHOT||{},box=$("home");
   box.innerHTML="";applyTheme(null);document.body.classList.add("home","spmode");
-  var head=el("div","cgh");head.appendChild(el("h3","","♫ Semua lagu (Spotify)"));
-  head.appendChild(el("small","",S.sp&&S.sp.tracks?fmt(S.sp.tracks.length)+" lagu":""));
-  box.appendChild(head);
   if(!S.sp||!S.sp.tracks||!S.sp.tracks.length){box.appendChild(spEmpty());return}
-  var inp=el("input","");inp.type="search";inp.placeholder="Cari lagu…";inp.value=spQ;inp.style.cssText="width:100%;max-width:420px;margin:0 0 14px";
-  inp.oninput=function(){spQ=inp.value;renderSpList()};box.appendChild(inp);
-  var q=spQ.toLowerCase(),L=trackList().sort(function(a,b){return b.v-a.v}).filter(function(x){return !q||((x.t.name||"")+" "+(x.t.artist||"")+" "+(x.t.album||"")).toLowerCase().indexOf(q)>=0});
-  if(!L.length){box.appendChild(el("p","empty","Tidak ada lagu yang cocok."));return}
+  var ars=(S.sp.artists||[]),fa=null;
+  if(spAF!=="all"){ars.forEach(function(x){if(!fa&&x.id===spAF)fa=x});if(!fa)spAF="all"}
+  if(fa)applyTheme(fa.name);
+  var head=el("div","cgh");head.appendChild(el("h3","","♫ "+(fa?(fa.name||"Artis"):"Semua lagu")+" (Spotify)"));
+  head.appendChild(el("small","",fmt(S.sp.tracks.length)+" lagu · "+ars.length+" artis"));
+  box.appendChild(head);
+  /* pemisah artis — seperti chip kategori di halaman Peringkat YouTube */
+  var cb=el("div","mvtools");
+  var chip=function(label,on,fn,cls){var b=el("button","chip"+(cls?" "+cls:""),label);b.type="button";b.setAttribute("aria-pressed",String(!!on));b.onclick=function(){fn();renderSpList()};return b};
+  cb.appendChild(chip("Semua "+trackList().length,spAF==="all",function(){spAF="all"}));
+  ars.forEach(function(a){
+    var cls=themeOf(a.name);cb.appendChild(chip((a.name||a.id)+" "+spTracksOf(a).length,spAF===a.id,function(){spAF=a.id},cls?"th-"+cls:""));
+  });
+  box.appendChild(cb);
+  var tools=el("div","mvtools"),inp=el("input","");
+  inp.type="search";inp.placeholder="Cari lagu…";inp.value=spQ;inp.style.cssText="width:100%;max-width:420px";
+  tools.appendChild(inp);
+  var seg=el("div","seg");
+  [["total","Total"],["hot","Naik 24 jam"]].forEach(function(o){
+    var b=el("button","",o[1]);b.type="button";b.setAttribute("aria-pressed",String(spSort===o[0]));
+    b.onclick=function(){spSort=o[0];seg.querySelectorAll("button").forEach(function(x){x.setAttribute("aria-pressed","false")});b.setAttribute("aria-pressed","true");paint()};
+    seg.appendChild(b);
+  });
+  tools.appendChild(seg);box.appendChild(tools);
+  var wrap=el("div");box.appendChild(wrap);
+  inp.oninput=function(){spQ=inp.value;paint()};
+  function paint(){
+    wrap.innerHTML="";
+    var q=spQ.toLowerCase();
+    var L=(fa?spTracksOf(fa):trackList()).filter(function(x){return !q||((x.t.name||"")+" "+(x.t.artist||"")+" "+(x.t.album||"")).toLowerCase().indexOf(q)>=0});
+    if(spSort==="hot")L.sort(function(a,b){return (sp24(spArr(b.t.id))||0)-(sp24(spArr(a.t.id))||0)||b.v-a.v});
+    else L.sort(function(a,b){return b.v-a.v});
+    if(!L.length){wrap.appendChild(el("p","empty","Tidak ada lagu yang cocok."));return}
+    var lp=el("div","hm-box");
+    L.forEach(function(x,i){
+      var g=sp24(spArr(x.t.id)),b=el("button","hr-row");b.type="button";
+      b.innerHTML='<span class="rk">'+(i+1)+'</span>'+
+       (x.t.thumb?'<img alt="" loading="lazy" src="'+escH(x.t.thumb)+'">':'<span class="th"></span>')+
+       '<span class="ti"><b>'+escH(x.t.name)+'</b><small>'+escH(x.t.artist||"")+(x.t.album?" · "+escH(x.t.album):"")+'</small></span>'+
+       '<span class="n"><b>'+fmt(x.v)+'</b>'+(g?'<em style="color:var(--views)">'+sg(g)+' / 24 jam</em>':'')+'</span>';
+      b.onclick=function(){openSpTrack(x.t.id)};lp.appendChild(b);
+    });
+    wrap.appendChild(lp);
+  }
+  paint();
+}
+function renderSpArtists(){
+  spView="artists";syncNav("channel");
+  var S=window.SNAPSHOT||{},box=$("home");
+  box.innerHTML="";applyTheme(null);document.body.classList.add("home","spmode");
+  var head=el("div","cgh");head.appendChild(el("h3","","🎤 Artis (Spotify)"));
+  head.appendChild(el("small","","ketuk artis untuk melihat lagu & grafiknya"));
+  box.appendChild(head);
+  var ars=(S.sp&&S.sp.artists)||[];
+  if(!ars.length){box.appendChild(el("p","empty","Data artis membutuhkan SPOTIFY_CLIENT_ID & SPOTIFY_CLIENT_SECRET di GitHub Secrets, lalu jalankan ulang Actions."));return}
+  var kz=el("div","hm-box");
+  ars.forEach(function(a){
+    var h=spArrK("ar:"+a.id,"f"),f=h.length?h[h.length-1].v:null,g=sp24(h);
+    var mine=spTracksOf(a),n=mine.length,tot=0;mine.forEach(function(x){tot+=x.v});
+    var b=el("button","hm-kc");b.type="button";
+    b.innerHTML=(a.thumb?'<img class="av" alt="" src="'+escH(a.thumb)+'">':'<span class="ic" aria-hidden="true">🎤</span>')+
+     '<span class="tx"><b>'+escH(a.name||a.id)+'</b><small>'+[(f!=null?fmt(f)+" follower":null),(a.listeners!=null?fmt(a.listeners)+" pendengar/bln":null),n+" lagu · "+short(tot)+" streams"].filter(Boolean).join(" · ")+'</small></span><span class="ar" aria-hidden="true">→</span>';
+    b.onclick=function(){openSpArtist(a.id)};
+    kz.appendChild(b);
+  });
+  box.appendChild(kz);
+}
+/* ---------- Halaman artis (Spotify, seperti halaman channel di YouTube) ---------- */
+function openSpArtist(id){
+  spSelA=id;
+  leaveHome();document.body.classList.add("home","spmode");
+  renderSpArtist();syncNav("channel");window.scrollTo(0,0);
+}
+function renderSpArtist(){
+  spView="artist";syncNav("channel");
+  var S=window.SNAPSHOT||{},box=$("home"),ars=(S.sp&&S.sp.artists)||[];
+  var a=null;ars.forEach(function(x){if(!a&&x.id===spSelA)a=x});
+  if(!a){renderSpArtists();return}
+  box.innerHTML="";applyTheme(a.name);document.body.classList.add("home","spmode");
+  var fh=spArrK("ar:"+a.id,"f"),mh=spArrK("ar:"+a.id,"m");
+  var f=fh.length?fh[fh.length-1].v:a.followers,m=mh.length?mh[mh.length-1].v:a.listeners;
+  var gf=sp24(fh)||0,gm=sp24(mh)||0;
+  var L=spTracksOf(a).sort(function(x,y){return y.v-x.v}),tot=0;L.forEach(function(x){tot+=x.v});
+  var root=el("div","");box.appendChild(root);
+  root.innerHTML=
+   '<div class="dvh"><div class="dvt">'+(a.thumb?'<img class="av" alt="" src="'+escH(a.thumb)+'" style="width:86px;height:86px;border-radius:18px;object-fit:cover">':'<span class="th"></span>')+
+   '<div style="min-width:0"><h2>'+escH(a.name||a.id)+'</h2><div class="sub" style="margin:0"><span class="badge" style="background:#1db954">SPOTIFY</span>'+(a.worldRank?"peringkat #"+a.worldRank+" dunia":"artis terpantau")+'</div>'+
+   '<div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap"><a class="btnlink" href="https://open.spotify.com/artist/'+escH(a.id)+'" target="_blank" rel="noopener">Buka di Spotify</a></div></div></div>'+
+   '<div class="dvs"><b class="big">'+(f!=null?fmt(f):"…")+'</b><span class="gn" style="color:var(--views)">'+(gf?sg(gf)+" / 24 jam":"")+'</span><small>pengikut</small></div>'+
+   '<div class="dvs dvr"><b class="big">'+(m!=null?fmt(m):"…")+'</b><span class="gn" style="color:var(--views)">'+(gm?sg(gm)+" / 24 jam":"")+'</span><small>pendengar per bulan</small></div></div>'+
+   '<div class="dvm"><div class="dvmain"></div><aside class="dvside"></aside></div>';
+  var main=root.querySelector(".dvmain"),side=root.querySelector(".dvside");
+  /* grafik pengikut / pendengar bulanan */
+  var gw=el("div","");
+  function paintG(){
+    var arr=spArK==="f"?fh:mh,lab=spArK==="f"?"PENGIKUT":"PENDENGAR PER BULAN";
+    gw.innerHTML='<div class="hm-tog" style="margin:0 0 8px"><button type="button" data-k="f" aria-pressed="'+(spArK==="f")+'">Pengikut</button><button type="button" data-k="m" aria-pressed="'+(spArK==="m")+'">Pendengar bln</button>'+
+     '<button type="button" data-r="604800000" aria-pressed="'+(spArR==="604800000")+'">7 Hari</button><button type="button" data-r="2592000000" aria-pressed="'+(spArR==="2592000000")+'">1 Bulan</button><button type="button" data-r="0" aria-pressed="'+(spArR==="0")+'">Semua</button></div>'+
+     '<div class="dl"><i style="background:var(--views)"></i>'+lab+'</div><svg class="chart" viewBox="0 0 800 220" style="width:100%;height:auto;display:block"></svg>';
+    var svg=gw.querySelector("svg.chart"),R=Number(spArR)||0,now=Date.now();
+    var pts=R?arr.filter(function(p){return p.t>=now-R}):arr;
+    pts=dsample(pts,320);
+    if(pts.length>1){var wC=Math.max(320,Math.floor(svg.getBoundingClientRect().width)||800);drawSeries(svg,pts,"v","var(--views)",pts[0].t,pts[pts.length-1].t,true,true,true,wC)}
+    else gw.appendChild(el("p","empty","Riwayat masih sedikit — tunggu beberapa pencatatan (dicatat tiap ±30 menit)."));
+    gw.querySelectorAll("button[data-k]").forEach(function(b){b.onclick=function(){spArK=b.dataset.k;paintG()}});
+    gw.querySelectorAll("button[data-r]").forEach(function(b){b.onclick=function(){spArR=b.dataset.r;paintG()}});
+  }
+  main.appendChild(gw);paintG();
+  /* samping: kota pendengar terbanyak + ringkasan */
+  var ct=(a.cities||[]),cs2="";
+  ct.forEach(function(c,i){cs2+='<span class="k">'+(i+1)+". "+escH(c.city||"?")+', '+escH(c.country||"")+'</span><span>'+(c.listeners!=null?fmt(c.listeners):"–")+'</span>'});
+  side.innerHTML='<div class="mile"><h3>KOTA PENDENGAR TERBANYAK</h3>'+
+   (ct.length?'<div class="meta">'+cs2+'</div>':'<p class="sub">Belum ada data kota.</p>')+
+   '</div><div class="mile" style="margin-top:14px"><h3>RINGKASAN</h3><div class="meta">'+
+   '<span class="k">Lagu terpantau</span><span>'+L.length+'</span>'+
+   '<span class="k">Total streams</span><span>'+fmt(tot)+'</span>'+
+   '<span class="k">Paling banyak diputar</span><span>'+(L.length?escH(L[0].t.name||"–")+(L[0].v!=null?" · "+fmt(L[0].v):""):"–")+'</span>'+
+   ((fh.length>1)?'<span class="k">Pengikut saat mulai dicatat</span><span>'+fmt(fh[0].v)+'</span>':'')+
+   '</div></div>';
+  /* daftar lagu artis ini */
+  var sec=el("div",""),hd=el("div","cgh");
+  hd.appendChild(el("h3","","🎵 Lagu "+(a.name||"")));hd.appendChild(el("small","",L.length+" lagu · "+short(tot)+" streams"));
+  sec.appendChild(hd);
   var lp=el("div","hm-box");
-  L.forEach(function(x,i){
+  L.slice(0,12).forEach(function(x,i){
     var g=sp24(spArr(x.t.id)),b=el("button","hr-row");b.type="button";
     b.innerHTML='<span class="rk">'+(i+1)+'</span>'+
      (x.t.thumb?'<img alt="" loading="lazy" src="'+escH(x.t.thumb)+'">':'<span class="th"></span>')+
@@ -1532,25 +1659,9 @@ function renderSpList(){
      '<span class="n"><b>'+fmt(x.v)+'</b>'+(g?'<em style="color:var(--views)">'+sg(g)+' / 24 jam</em>':'')+'</span>';
     b.onclick=function(){openSpTrack(x.t.id)};lp.appendChild(b);
   });
-  box.appendChild(lp);
-}
-function renderSpArtists(){
-  spView="artists";
-  var S=window.SNAPSHOT||{},box=$("home");
-  box.innerHTML="";applyTheme(null);document.body.classList.add("home","spmode");
-  box.appendChild(el("h3","","🎤 Artis (Spotify)"));
-  var ars=(S.sp&&S.sp.artists)||[];
-  if(!ars.length){box.appendChild(el("p","empty","Data artis membutuhkan SPOTIFY_CLIENT_ID & SPOTIFY_CLIENT_SECRET di GitHub Secrets, lalu jalankan ulang Actions."));return}
-  var kz=el("div","hm-box");
-  ars.forEach(function(a){
-    var h=spArr("ar:"+a.id),f=h.length?h[h.length-1].v:null,g=sp24(h);
-    var b=el("button","hm-chb");b.type="button";
-    b.innerHTML=(a.thumb?'<img alt="" src="'+escH(a.thumb)+'">':'')+
-     '<span class="tx"><b>'+escH(a.name||a.id)+'</b><small>'+[(f!=null?fmt(f)+" follower":null),(a.listeners!=null?fmt(a.listeners)+" pendengar/bln":null),(g?'<b style="color:var(--views)">'+sg(g)+"</b> / 24 jam":null)].filter(Boolean).join(" · ")+'</small></span>';
-    b.onclick=function(){window.open("https://open.spotify.com/artist/"+escH(a.id),"_blank","noopener")};
-    kz.appendChild(b);
-  });
-  box.appendChild(kz);
+  if(!L.length)lp.appendChild(el("p","empty","Belum ada lagu yang terhubung untuk artis ini."));
+  if(L.length>12){var more=el("button","hm-more2","Lihat semua lagu "+(a.name||"")+" →");more.type="button";more.onclick=function(){spAF=a.id;spQ="";navGo("rank")};lp.appendChild(more)}
+  sec.appendChild(lp);box.appendChild(sec);
 }
 function openSpTrack(id){
   spSel=id;dtsp.range="all";dtsp.off=0;
@@ -1558,7 +1669,7 @@ function openSpTrack(id){
   renderSpDetail();syncNav("rank");window.scrollTo(0,0);
 }
 function renderSpDetail(){
-  spView="detail";
+  spView="detail";syncNav("rank");
   var S=window.SNAPSHOT||{},box=$("home");
   var hit=trackList().filter(function(x){return x.t.id===spSel})[0];
   if(!hit){renderSpList();return}
@@ -1664,6 +1775,7 @@ function renderSpDetail(){
 function renderHome(){
   if(SRC==="sp"){
     if(spView==="detail"&&spSel)return renderSpDetail();
+    if(spView==="artist"&&spSelA)return renderSpArtist();
     if(spView==="list")return renderSpList();
     if(spView==="artists")return renderSpArtists();
     return renderSpHome();
@@ -1820,7 +1932,7 @@ document.querySelectorAll("#tnlinks button").forEach(function(b){b.onclick=funct
 document.querySelectorAll("#srcsw button").forEach(function(b){b.onclick=function(){
   if(SRC===b.dataset.src)return;
   var wasYt=detail,wasSp=spSel;
-  setSrc(b.dataset.src);detail=null;spSel=null;spView="home";
+  setSrc(b.dataset.src);detail=null;spSel=null;spSelA=null;spAF="all";spView="home";
   if(SRC==="sp"&&wasYt){var v=((window.SNAPSHOT||{}).tracked||[]).filter(function(x){return x.id===wasYt})[0];var tr=v?ytToTrack(v.title,v.id):null;if(tr){openSpTrack(tr.id);return}}
   if(SRC==="yt"&&wasSp&&window.SNAPSHOT&&window.SNAPSHOT.sp){var t2=((window.SNAPSHOT.sp.tracks)||[]).filter(function(x){return x.id===wasSp})[0];var v2=trackToVideo(t2);if(v2){leaveHome();openVideo(v2.id);return}}
   navGo("home");
@@ -1852,4 +1964,4 @@ if(!window.SNAPSHOT||window.SNAPSHOT.live)setInterval(load,15000);
 </body>
 </html>
 
-<!-- build: spotify-toggle v12 -->
+<!-- build: spotify-artis v13 -->
