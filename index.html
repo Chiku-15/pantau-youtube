@@ -13,10 +13,10 @@
 .tn{max-width:1280px;margin:0 auto;padding:9px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .brand{display:inline-flex;align-items:center;gap:9px;font-weight:800;font-size:1.02rem;letter-spacing:-.02em;border:0;background:transparent;color:var(--ink);padding:4px 2px}
 .brand i{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,var(--ac),var(--ok));display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:.62rem;font-style:normal}
-.tn-links{display:flex;gap:2px;margin-left:4px}
-.tn-links button{border:0;background:transparent;color:var(--muted);padding:8px 12px;border-radius:8px;font-weight:600;font-size:.92rem}
+.tn-links{display:flex;gap:2px;margin-left:4px;background:color-mix(in srgb,var(--surface) 75%,transparent);border:1px solid var(--line);border-radius:99px;padding:3px}
+.tn-links button{border:0;background:transparent;color:var(--muted);padding:7px 14px;border-radius:99px;font-weight:700;font-size:.9rem;line-height:1.2;white-space:nowrap}
 .tn-links button:hover{color:var(--ink);background:var(--surface)}
-.tn-links button[aria-current="true"]{color:var(--ac);background:color-mix(in srgb,var(--ac) 13%,transparent)}
+.tn-links button[aria-current="true"]{color:#fff;background:var(--ac);box-shadow:0 2px 10px color-mix(in srgb,var(--ac) 45%,transparent)}
 .tn-search{flex:1;min-width:150px;max-width:330px;margin-left:auto}
 .tn-search input{width:100%;padding:8px 14px;border-radius:99px;font-size:.9rem}
 @media(max-width:680px){.tn-search{display:none}.tn-links{margin-left:auto}}
@@ -96,6 +96,9 @@ td.note{color:var(--muted);font-size:.82rem}
 .aproj{margin:0 0 12px;font-size:.88rem;line-height:1.5;background:color-mix(in srgb,var(--ok) 10%,transparent);border:1px solid color-mix(in srgb,var(--ok) 28%,transparent);border-radius:10px;padding:8px 12px}
 .aproj b{color:var(--ok)}
 .aproj:empty{display:none}
+.slowinfo{background:color-mix(in srgb,var(--ac) 9%,var(--surface));border:1px solid color-mix(in srgb,var(--ac) 30%,transparent);border-radius:10px;padding:9px 12px;font-size:.85rem;line-height:1.65;margin:0 0 10px;color:var(--ink)}
+.slowinfo b{font-variant-numeric:tabular-nums}
+.slowinfo[hidden]{display:none}
 @media(max-width:480px){.seg button{padding:7px 9px;font-size:.85rem}}
 .tabs{margin-bottom:14px}
 .card.ch{grid-template-columns:90px 1fr}
@@ -143,7 +146,6 @@ body:not(.home) #home{display:none}
 .dvm{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:26px;margin-top:18px}
 .cgrid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
 .cgrid>div{min-width:0}
-.btnback{justify-self:start;width:auto}
 @media(max-width:760px){.cgrid{grid-template-columns:1fr}}
 .dvm svg{width:100%;height:auto;display:block;touch-action:pan-y}
 @media(max-width:860px){.dvh{grid-template-columns:1fr 1fr}.dvt{grid-column:1/-1}.dvm{grid-template-columns:1fr}.dvr{text-align:left}}
@@ -229,6 +231,34 @@ body:not(.home) #home{display:none}
 .hm-stat small{display:block;color:var(--muted);font-size:.8rem}
 .hm-stat b{display:block;font-size:1.35rem;font-variant-numeric:tabular-nums;letter-spacing:-.02em;margin-top:2px}
 .hm-stat.acc b{color:var(--ok)}
+/* bagian "Perubahan angka" (pengganti ringkasan tambahan) */
+.hm-chg{margin-top:16px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:0 14px 34px -24px rgba(0,0,0,.4)}
+.cgh{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.cgh h3{margin:0;font-size:1.06rem;letter-spacing:-.02em}
+.cgh small{color:var(--muted)}
+.cg-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
+.cg-ch{display:block;text-align:left;padding:12px 14px;border-radius:12px;background:var(--bg);border:1px solid var(--line);transition:transform .15s,border-color .15s}
+.cg-ch:hover{border-color:var(--ac);transform:translateY(-1px)}
+.cg-ch .nm{display:block;font-weight:800;font-size:.92rem;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cg-ch .num{display:block;font-size:1.18rem;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.cg-ch .num small{font-size:.76rem;color:var(--muted);font-weight:600}
+.cg-ch em{display:block;font-style:normal;font-weight:700;font-size:.78rem;margin-top:3px;color:var(--ok)}
+.cg-ch em.flat{color:var(--muted);font-weight:600}
+.cg-ch em.dn{color:var(--views)}
+.cg-ch small{display:block;color:var(--muted);font-size:.78rem;margin-top:2px}
+.cg-feed{margin-top:4px}
+.cg-row{display:flex;gap:10px;align-items:flex-start;padding:9px 2px;border-bottom:1px dashed var(--line)}
+.cg-row:last-child{border-bottom:0}
+.cg-t{flex:none;width:118px;color:var(--muted);font-size:.76rem;font-weight:600;padding-top:2px}
+.cg-b{flex:none;width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;border-radius:99px;font-size:.9rem}
+.cg-b.sb{background:color-mix(in srgb,var(--likes) 15%,transparent)}
+.cg-b.vb{background:color-mix(in srgb,var(--views) 15%,transparent)}
+.cg-x{min-width:0;font-size:.9rem;line-height:1.45}
+.cg-x b{font-weight:800}
+.cg-x em{font-style:normal;color:var(--ok);font-weight:800;white-space:nowrap}
+.cg-x em.dn{color:var(--views)}
+.cg-x small{display:block;color:var(--muted);font-size:.78rem;margin-top:1px}
+@media(max-width:640px){.cg-t{width:86px;font-size:.7rem}.hm-chg{padding:14px}}
 .hm-sec{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin:38px 0 14px}
 .hm-sec h3{font-size:1.3rem;margin:0;letter-spacing:-.02em}
 .hm-sec small{color:var(--muted)}
@@ -451,6 +481,7 @@ function fmt(n){return n===null||n===undefined?"–":nf.format(n)}
 function sg(n){return n===null||n===undefined?"–":(n>0?"+":"")+fmt(n)}
 function el(tag,cls,text){var e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e}
 function hhmm(t){return new Date(t).toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"})}
+function durTxt(ms){var m=Math.round(ms/6e4);if(m<90)return m+" mnt";var h=m/60;if(h<48)return (Math.round(h*10)/10).toLocaleString("id-ID")+" jam";return Math.round(h/24)+" hari"}
 function stamp(t,span){
   var d=new Date(t);
   if(span<=26*3600e3)return hhmm(t);
@@ -549,7 +580,7 @@ var VBAUTO={"24h":"hour","7d":"day","30d":"day","365d":"month",all:"month"};
 var VSCAP={hour:"48 jam terakhir",day:"60 hari terakhir",week:"52 pekan terakhir",month:"24 bulan terakhir"};
 /* ---------- Komponen grafik + analisis (dipakai tab Video dan tab Channel) ---------- */
 function makeViz(root,cfg){
-  var st={id:null,m:cfg.metrics[0][0],r:"24h",b:"hour",hist:[],sum:[]};
+  var st={id:null,m:cfg.metrics[0][0],m2:"abs",r:"24h",b:"hour",hist:[],sum:[]};
   var NAME={},COL={};cfg.metrics.forEach(function(x){NAME[x[0]]=x[1];COL[x[0]]=x[2]});
   // Label sumbu Y memakai ylab()/yticks() global — jumlah digit menyesuaikan
   // rapatnya grid, jadi angka besar dengan perubahan kecil tetap terbaca beda.
@@ -557,7 +588,9 @@ function makeViz(root,cfg){
   root.innerHTML=
    '<section class="panel" data-r="panel" hidden><h2 data-r="ptitle">Grafik</h2>'+
    '<div class="ctl"><div class="seg" role="group" aria-label="Pilih data">'+segM()+'</div>'+
+   '<div class="seg" role="group" aria-label="Gaya grafik"><button type="button" data-m2="abs" aria-pressed="true">Nilai</button><button type="button" data-m2="delta" aria-pressed="false">Kenaikan</button></div>'+
    '<div class="seg" role="group" aria-label="Pilih rentang waktu"><button type="button" data-r="24h" aria-pressed="true">1 Hari</button><button type="button" data-r="7d" aria-pressed="false">7 Hari</button><button type="button" data-r="30d" aria-pressed="false">1 Bulan</button><button type="button" data-r="365d" aria-pressed="false">1 Tahun</button><button type="button" data-r="all" aria-pressed="false">Semua</button></div></div>'+
+   '<div data-r="slow" class="slowinfo" hidden></div>'+
    '<p data-r="gain" style="color:var(--muted);font-size:.9rem;margin:0 0 4px"></p>'+
    '<p data-r="readout" style="min-height:1.5em;font-size:.9rem;margin:0 0 6px;font-weight:600">Arahkan kursor ke grafik untuk melihat angka.</p>'+
    '<div class="empty" data-r="empty" hidden>Data masih sedikit. Tunggu beberapa menit sampai server mencatat lebih dari satu kali.</div>'+
@@ -581,6 +614,7 @@ function makeViz(root,cfg){
   function q(n){return root.querySelector('[data-r="'+n+'"]')}
   function sync(){
     root.querySelectorAll("button[data-m]").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.m===st.m))});
+    root.querySelectorAll("button[data-m2]").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.m2===st.m2))});
     root.querySelectorAll("button[data-r]").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.r===st.r))});
     root.querySelectorAll("button[data-b]").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.b===st.b))});
   }
@@ -1024,10 +1058,7 @@ function drawBars(svg,bk,by,W){
 var __rz;window.addEventListener("resize",function(){clearTimeout(__rz);__rz=setTimeout(function(){if(window.__dvp&&detail&&tab==="video"&&document.querySelector(".dvmain"))window.__dvp()},150)});
 function renderDetail(box,v){
   var arr=((window.SNAPSHOT||{}).vs||{})[v.id]||[],T=TABS.video;
-  var back=el("button","btnback","← Kembali");back.type="button";
-  back.onclick=function(){detail=null;renderCards();window.scrollTo(0,0)};
-  box.appendChild(back);
-  var root=el("div","");root.style.marginTop="14px";box.appendChild(root);
+  var root=el("div","");box.appendChild(root);
   if(!arr.length){root.appendChild(el("p","empty","Menunggu data pertama dari server."));return}
   var first=arr[0],last=arr[arr.length-1];
   var d0=new Date();d0.setHours(0,0,0,0);
@@ -1169,8 +1200,8 @@ function load(){
 function leaveHome(){document.body.classList.remove("home");window.scrollTo(0,0)}
 var hmSeen=false;
 var hmCh={r:"7d",off:0,drag:false},hmSer=null,hmcN=0;
-var HMR={"7d":6048e5,"30d":30*864e5,"90d":91*864e5};
-var HMRN={"7d":"7 hari terakhir","30d":"30 hari terakhir","90d":"3 bulan terakhir"};
+var HMR={"1d":864e5,"7d":6048e5,"30d":2592e6,"365d":31536e6};
+var HMRN={"1d":"24 jam terakhir","7d":"7 hari terakhir","30d":"30 hari terakhir","365d":"1 tahun terakhir",all:"sepanjang masa"};
 function hmSeries(rows){
   var S=window.SNAPSHOT||{},vs=S.vs||{},ids=[],t0=Infinity,t1=0;
   rows.forEach(function(x){var it=x.v||x,a=vs[it.id];if(a&&a.length){ids.push(a);if(a[0].t<t0)t0=a[0].t;if(a[a.length-1].t>t1)t1=a[a.length-1].t}});
@@ -1198,7 +1229,7 @@ function hmPanel(rows){
   var tot=0;rows.forEach(function(x){var it=x.v||x;if(it.latest&&it.latest.v!=null)tot+=it.latest.v||0});
   d.innerHTML='<div class="chd"><b class="ct">📈 Perkembangan Total Views</b>'+
    '<span class="chd2"><button type="button" class="hreset">⟲ Terbaru</button><span class="hm-tog">'+
-   [["7d","7 Hari"],["30d","30 Hari"],["90d","3 Bulan"]].map(function(x){
+   [["1d","1 Hari"],["7d","7 Hari"],["30d","1 Bulan"],["365d","1 Tahun"],["all","Semua"]].map(function(x){
      return '<button type="button" data-r="'+x[0]+'" class="'+(hmCh.r===x[0]?"on":"")+'">'+x[1]+"</button>";
    }).join("")+"</span></span></div>"+
    '<div class="pn"><b>'+fmt(tot)+'</b><span class="chg"></span></div>'+
@@ -1212,7 +1243,7 @@ function hmPanel(rows){
   navL.addEventListener("pointerdown",function(e){navPan(e,1)});
   navR.addEventListener("pointerdown",function(e){navPan(e,-1)});
   function dayL(t,wd,yr){var o={day:"numeric",month:"short"};if(wd)o.weekday="short";if(yr)o.year="numeric";return new Date(t).toLocaleDateString("id-ID",o)}
-  function cur(){var R=HMR[hmCh.r]||HMR["7d"],t1=ser.t1,maxOff=Math.max(0,t1-ser.t0-R),off=Math.max(0,Math.min(hmCh.off,maxOff));return {R:R,t1:t1,maxOff:maxOff,off:off,w0:t1-off-R,w1:t1-off}}
+  function cur(){var t1=ser.t1;if(hmCh.r==="all"){var R0=Math.max(36e5,t1-ser.t0);return {R:R0,t1:t1,maxOff:0,off:0,w0:t1-R0,w1:t1}}var R=HMR[hmCh.r]||HMR["7d"],maxOff=Math.max(0,t1-ser.t0-R),off=Math.max(0,Math.min(hmCh.off,maxOff));return {R:R,t1:t1,maxOff:maxOff,off:off,w0:t1-off-R,w1:t1-off}}
   function lastTxt(){var p=ser.pts[ser.pts.length-1];return dayL(p.t,1,1)+" · "+hhmm(p.t)+" — "+fmt(p.y)+" views"}
   function hideX(){if(svg){var xh=svg.querySelector(".xhl"),xc=svg.querySelector(".xhc");if(xh)xh.setAttribute("opacity","0");if(xc)xc.setAttribute("opacity","0")}}
   function hint(){if(ser.pts.length<2){read.innerHTML="";return}hideX();read.innerHTML='<i></i><span>'+(touched?lastTxt():HINT)+"</span>"}
@@ -1243,7 +1274,7 @@ function hmPanel(rows){
     }
     for(var k=0;k<5;k++){
       var f=k/4,tx=(L+PW*f).toFixed(1),t=w.w0+w.R*f,anc=k===0?"start":k===4?"end":"middle";
-      g+='<text x="'+tx+'" y="'+(H-8)+'" text-anchor="'+anc+'" fill="var(--ink)" opacity=".75" font-size="11">'+escH(w.R<=8*864e5?dayL(t,1,0):dayL(t,0,0))+"</text>";
+      g+='<text x="'+tx+'" y="'+(H-8)+'" text-anchor="'+anc+'" fill="var(--ink)" opacity=".75" font-size="11">'+escH(w.R<=26*36e5?hhmm(t):w.R<=8*864e5?dayL(t,1,0):w.R<=45*864e5?dayL(t,0,0):dayL(t,0,1))+"</text>";
     }
     var line=ps.map(function(p,i){return (i?"L":"M")+X(p.t).toFixed(1)+","+Y(p.y).toFixed(1)}).join(" ");
     var area=line+" L"+X(ps[ps.length-1].t).toFixed(1)+","+(T+PH)+" L"+X(ps[0].t).toFixed(1)+","+(T+PH)+" Z";
@@ -1261,11 +1292,11 @@ function hmPanel(rows){
      '<circle class="xhc" r="4.5" fill="var(--ac)" stroke="var(--surface)" stroke-width="2" opacity="0" pointer-events="none"/></svg>';
     svg=cw.firstChild;
     var a0=atT(ser.pts,w.w0)||ser.pts[0],a1=atT(ser.pts,w.w1),gain=a0&&a1?a1.y-a0.y:null;
-    chg.textContent=gain==null?"":(gain>=0?"+":"")+short(gain)+" "+(w.off>6e4?"di bagian ini":"dalam "+HMRN[hmCh.r]);
+    chg.textContent=gain==null?"":(gain>=0?"+":"")+short(gain)+" "+(w.off>6e4?"di bagian ini":"dalam "+(HMRN[hmCh.r]||"rentang ini"));
     chg.classList.toggle("show",chg.textContent!=="");
     reset.style.display=w.off>6e4?"inline-flex":"none";
     cw.appendChild(rangeEl);cw.appendChild(navL);cw.appendChild(navR);
-    rangeEl.textContent="📍 "+dayL(w.w0,0,0)+" – "+dayL(w.w1,0,0);
+    rangeEl.textContent="📍 "+(w.w0<ser.t0-6e4?"pencatatan mulai "+dayL(ser.t0,0,1):w.R<=26*36e5?dayL(w.w0,1,0)+" "+hhmm(w.w0)+" – "+hhmm(w.w1):dayL(w.w0,0,0)+" – "+dayL(w.w1,0,0));
     navL.style.display=hmCh.off<w.maxOff-6e4?"flex":"none";
     navR.style.display=w.off>6e4?"flex":"none";
     hint();
@@ -1275,13 +1306,14 @@ function hmPanel(rows){
     if(!svg||ser.pts.length<2)return;
     var r=svg.getBoundingClientRect(),w=cur(),px=(e.clientX-r.left)/r.width*560;
     if(px<50||px>548){hint();return}
-    var t=w.w0+(px-56)/(560-56-12)*w.R,best=null,bd=1e18;
-    ser.pts.forEach(function(p){var dd=Math.abs(p.t-t);if(dd<bd){bd=dd;best=p}});
+    var t=w.w0+(px-56)/(560-56-12)*w.R,best=null,bi=-1,bd=1e18,i,dd;
+    for(i=0;i<ser.pts.length;i++){dd=Math.abs(ser.pts[i].t-t);if(dd<bd){bd=dd;best=ser.pts[i];bi=i}}
     if(!best||best.t<w.w0-864e5||best.t>w.w1+864e5){hint();return}
     var xh=svg.querySelector(".xhl"),xc=svg.querySelector(".xhc");
     if(xh){xh.setAttribute("x1",px.toFixed(1));xh.setAttribute("x2",px.toFixed(1));xh.setAttribute("opacity",".85")}
     if(xc&&xmap&&ymap){xc.setAttribute("cx",xmap(best.t).toFixed(1));xc.setAttribute("cy",ymap(best.y).toFixed(1));xc.setAttribute("opacity","1")}
-    read.innerHTML='<i></i><span>'+dayL(best.t,1,1)+" \u00b7 "+hhmm(best.t)+" \u2014 "+fmt(best.y)+" views</span>";
+    var pv=bi>0?ser.pts[bi-1]:null,dy=pv&&best.y!=null&&pv.y!=null?best.y-pv.y:null;
+    read.innerHTML='<i></i><span>'+dayL(best.t,1,1)+" \u00b7 "+hhmm(best.t)+" \u2014 "+fmt(best.y)+" views"+(dy===null?"":dy===0?" \u00b7 tetap dari catatan sebelumnya":" \u00b7 <b>"+sg(dy)+" views</b> dalam "+durTxt(best.t-pv.t)+" sebelumnya")+"</span>";
   }
   var dragS=null;
   cw.addEventListener("pointerdown",function(e){
@@ -1318,14 +1350,36 @@ function applyTheme(n){var t=themeOf(n);document.body.classList.remove("th-bm","
 function openChannelList(name,cat){rk.cat=cat||"all";chFilter=name;leaveHome();renderCards()}
 var HMCATS=[["mv","🎬","MV","Video musik resmi"],["dp","💃","Dance Performance","Penampilan koreografi"],["dpr","🕺","Dance Practice","Latihan tari"]];
 function goList(cat){rk.cat=cat||"all";chFilter=null;leaveHome();renderCards()}
+/* ---------- Data untuk bagian "Perubahan angka" ---------- */
+function chgData(chs,rows){
+  var cs=(window.SNAPSHOT||{}).cs||{},per=[],subs=[],top=null;
+  chs.forEach(function(c){
+    var a=cs[c.id]||[],step=null,vt=null,vh=null,i,p,q;
+    for(i=1;i<a.length;i++){
+      p=a[i-1];q=a[i];
+      if(p.s!=null&&q.s!=null&&q.s!==p.s)step={t:q.t,from:p.s,to:q.s,d:q.s-p.s};
+    }
+    if(step)subs.push({ch:c.title||c.id,t:step.t,from:step.from,to:step.to,d:step.d});
+    if(a.length){
+      var l=a[a.length-1],d0=new Date();d0.setHours(0,0,0,0);
+      var b0=atT(a,d0.getTime())||a[0];
+      if(l.v!=null&&b0.v!=null)vt={d:l.v-b0.v};
+      var bh=atT(a,l.t-36e5);
+      if(bh&&l.v!=null&&bh.v!=null)vh={d:l.v-bh.v,t:l.t,now:l.v};
+    }
+    per.push({ch:c,step:step,vt:vt,vh:vh});
+  });
+  rows.forEach(function(r){if(r.s&&r.s.g24>0&&(!top||r.s.g24>top.g))top={g:r.s.g24,v:r.v}});
+  subs.sort(function(a,b){return b.t-a.t});
+  return {per:per,subs:subs,top:top};
+}
 function renderHome(){
   syncNav("home");
   return Promise.all([api("/api/tracked"),api("/api/channels")]).then(function(r){
     if(hmCh.drag)return;
     var vs=r[0].items.filter(function(x){return x.latest&&!JUNK.test((x.title||"").toLowerCase())}),chs=r[1].items,box=$("home");
-    var rows=vs.map(function(v){return {v:v,s:vStats(v)}}),tv=0,tg=0,last=0;
-    rows.forEach(function(x){tv+=x.v.latest.v||0;if(x.s)tg+=x.s.g24;last=Math.max(last,x.v.latest.t)});
-    var subs=chs.reduce(function(a,x){return a+((x.latest&&x.latest.s)||0)},0);
+    var rows=vs.map(function(v){return {v:v,s:vStats(v)}}),tv=0,last=0;
+    rows.forEach(function(x){tv+=x.v.latest.v||0;last=Math.max(last,x.v.latest.t)});
     var byViews=rows.slice().sort(function(a,b){return (b.v.latest.v||0)-(a.v.latest.v||0)});
     box.innerHTML="";box.className=hmSeen?"":"hm-anim";hmSeen=true;applyTheme(null);
     /* hero ringkas */
@@ -1338,12 +1392,42 @@ function renderHome(){
     cta.appendChild(b1);cta.appendChild(b2);tx.appendChild(cta);hero.appendChild(tx);
     hero.appendChild(hmPanel(rows));
     box.appendChild(hero);
-    /* statistik ringkas */
-    var st=el("div","hm-stats");
-    [["Video dipantau",fmt(vs.length)],["Total views",fmt(tv)],["Naik 24 jam",sg(tg),1],["Subscriber",fmt(subs)]].forEach(function(x){
-      var d=el("div","hm-stat"+(x[2]?" acc":""));d.appendChild(el("small","",x[0]));d.appendChild(el("b","",x[1]));st.appendChild(d);
+    /* bagian "Perubahan angka" — pengganti ringkasan tambahan:
+       langkah subscriber (13,5 jt → 14 jt) + views per jam/hari, angka penuh */
+    var CD=chgData(chs,rows),sec=el("section","hm-chg");
+    var cgh=el("div","cgh");
+    cgh.appendChild(el("h3","","🔔 Perubahan angka terbaru"));
+    cgh.appendChild(el("small","",fmt(vs.length)+" video · "+chs.length+" channel · "+fmt(tv)+" total views"));
+    sec.appendChild(cgh);
+    var strip=el("div","cg-strip");
+    CD.per.forEach(function(p){
+      var c=p.ch,b=el("button","cg-ch");b.type="button";
+      var num=c.latest?(c.latest.s!==null?fmt(c.latest.s)+' <small>subscriber</small>':'<small>subscriber disembunyikan</small>'):'…';
+      var em="";
+      if(p.step)em='<em class="'+(p.step.d>=0?"up":"dn")+'">'+(p.step.d>=0?"▲ +":"▼ ")+fmt(Math.abs(p.step.d))+" · "+escH(upAgo(p.step.t))+"</em>";
+      else if(c.latest&&c.latest.s!==null&&c.first)em='<em class="flat">• tetap '+fmt(c.latest.s)+" sejak "+escH(dvDate(c.first.t,1))+"</em>";
+      b.innerHTML='<span class="nm">'+escH(c.title||c.id)+"</span>"+
+       '<span class="num">'+num+"</span>"+em+
+       (p.vt?"<small>📊 <b>"+(p.vt.d>=0?"+":"")+fmt(p.vt.d)+"</b> views hari ini</small>":"");
+      b.onclick=function(){openChannelList(c.title,"all")};
+      strip.appendChild(b);
     });
-    box.appendChild(st);
+    sec.appendChild(strip);
+    sec.appendChild(el("p","zzz","Jejak perubahan"));
+    var feed=el("div","cg-feed");
+    function frow(t,k,html){var r=el("div","cg-row");r.innerHTML='<span class="cg-t">'+t+'</span><span class="cg-b '+(k==="s"?"sb":"vb")+'">'+(k==="s"?"👤":"📊")+"</span>"+'<span class="cg-x">'+html+"</span>";feed.appendChild(r)}
+    CD.subs.slice(0,4).forEach(function(sp){
+      frow(escH(dvDate(sp.t,1))+" · "+hhmm(sp.t),"s","<b>"+escH(sp.ch)+"</b> — subscriber "+fmt(sp.from)+" → "+fmt(sp.to)+' <em class="'+(sp.d>=0?"up":"dn")+'">'+sg(sp.d)+"</em>"+
+       '<small>YouTube membulatkan angka subscriber, jadi naiknya melompat sekali lalu diam lagi.</small>');
+    });
+    CD.per.forEach(function(p){
+      if(p.vh&&p.vh.d>0)frow(hhmm(p.vh.t),"v","<b>"+escH(p.ch.title||p.ch.id)+"</b> — total views <em>"+sg(p.vh.d)+"</em> dalam jam terakhir → "+fmt(p.vh.now));
+    });
+    if(CD.top)frow(dvDate(Date.now(),1),"v","🏆 Paling cepat naik: <b>"+escH(CD.top.v.title||CD.top.v.id)+"</b> <em>"+sg(CD.top.g)+" views</em> / 24 jam");
+    if(!feed.children.length)feed.appendChild(el("p","empty","Menunggu perubahan pertama — angka dicatat ulang kira-kira tiap 5 menit."));
+    sec.appendChild(feed);
+    sec.appendChild(el("p","hnote","Catatan: subscriber dari YouTube dibulatkan (mis. 13,5 jt), jadi biasanya hanya berubah saat melompat ke angka bulat berikutnya (mis. 14 jt) — perubahan kecilnya memang butuh waktu lama. Total views tidak dibulatkan dan berubah hampir di tiap pencatatan."));
+    box.appendChild(sec);
     /* konten utama: daftar terpopuler + panel kanan */
     var main=el("div","hm-main"),lp=el("div","hm-box"),rp=el("div","hm-side");
     lp.appendChild(el("h3","","🔥 Terpopuler sepanjang masa"));
@@ -1379,7 +1463,7 @@ function renderHome(){
       var mine=rows.filter(function(x){return x.v.channel===c.title}),sv=0;mine.forEach(function(x){sv+=x.v.latest.v||0});
       var b=el("button","hm-kc");b.type="button";
       b.innerHTML=(c.thumb?'<img class="av" alt="" src="'+escH(c.thumb)+'">':'<span class="ic" aria-hidden="true">▶</span>')+
-       '<span class="tx"><b>'+escH(c.title||c.id)+'</b><small>'+(c.latest&&c.latest.s!==null?short(c.latest.s)+" subscriber · ":c.latest?"Subscriber disembunyikan · ":"")+mine.length+' video</small></span><span class="ar" aria-hidden="true">→</span>';
+       '<span class="tx"><b>'+escH(c.title||c.id)+'</b><small>'+(c.latest&&c.latest.s!==null?fmt(c.latest.s)+" subscriber · ":c.latest?"Subscriber disembunyikan · ":"")+mine.length+' video</small></span><span class="ar" aria-hidden="true">→</span>';
       b.onclick=function(){openChannelList(c.title,"all")};
       kz.appendChild(b);
     });
@@ -1457,4 +1541,4 @@ if(!window.SNAPSHOT||window.SNAPSHOT.live)setInterval(load,15000);
 </body>
 </html>
 
-<!-- build: detail-grafik v9 -->
+<!-- build: perubahan-angka v10 -->
