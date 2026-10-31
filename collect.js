@@ -289,7 +289,8 @@ async function spCollect(artistIds) {
   }
 
   // 2) Sampling album bergantian (round-robin) supaya semua album tercakup tanpa membebani Spotify
-  const list = c.albums, rr = Number(c.rr || 0) % Math.max(1, list.length);
+  //    (pakai daftar album yang baru ditemukan juga — penting saat cache masih kosong seperti di Actions)
+  const list = [...albums], rr = Number(c.rr || 0) % Math.max(1, list.length);
   const batch = [];
   for (let i = 0; i < Math.min(SP_MAX_ALBUMS, list.length); i++) batch.push(list[(rr + i) % list.length]);
   c.rr = (rr + batch.length) % Math.max(1, list.length);
